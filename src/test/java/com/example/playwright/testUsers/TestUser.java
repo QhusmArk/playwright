@@ -1,11 +1,10 @@
 package com.example.playwright.testUsers;
 
 public record TestUser(
-
-        String username,
-
-        String password
-
+        String email,
+        String role,
+        int id,
+        String password,
+        String token
 ) {
-
 }

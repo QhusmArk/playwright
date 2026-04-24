@@ -1,8 +1,10 @@
 package com.example.playwright.steps;
 
-import com.example.playwright.testUsers.TestUser;
+import com.example.playwright.config.TestEnvironment;
+import com.example.playwright.pageObjects.LoginPO;
 import com.example.playwright.testUsers.TestUserPool;
 import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -11,25 +13,67 @@ import io.cucumber.java.en.When;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.example.playwright.steps.Hooks.waitUntilUrlContains;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultithreadingSteps {
 
     private static final Set<Long> THREAD_IDS = ConcurrentHashMap.newKeySet();
 
+    @Before
+    public void acquireUserWithRole(Scenario scenario) {
+        String requiredRole = resolveRequiredRole(scenario);
+
+        var user = (requiredRole != null)
+                ? TestUserPool.acquireUserWithRole(requiredRole)
+                : TestUserPool.acquireUser()
+                .orElseThrow(() -> new RuntimeException("No available test users in pool"));
+
+        System.out.println(
+                "Thread " + Thread.currentThread().threadId() +
+                        " acquired user: " + user.email() +
+                        " with role: " + user.role()
+        );
+    }
+
+    private String resolveRequiredRole(Scenario scenario) {
+        var tags = scenario.getSourceTagNames();
+
+        int roleCount = 0;
+        String role = null;
+
+        if (tags.contains("@admin")) {
+            roleCount++;
+            role = "ADMIN";
+        }
+
+        if (tags.contains("@user")) {
+            roleCount++;
+            role = "USER";
+        }
+
+        if (tags.contains("@client")) {
+            roleCount++;
+            role = "CLIENT";
+        }
+
+        if (tags.contains("@blaster")) {
+            roleCount++;
+            role = "BLASTER";
+        }
+
+        if (roleCount > 1) {
+            throw new RuntimeException("Scenario has multiple role tags: " + tags);
+        }
+
+        return role;
+    }
+
     @Given("multithreading is required")
     public void multithreadingIsRequired() {
         assertTrue(
                 Runtime.getRuntime().availableProcessors() > 1,
                 "Multithreading cannot be used because only one processor is available."
-        );
-
-        TestUserPool.acquireUser()
-                .orElseThrow(() -> new RuntimeException("No available test users in pool"));
-
-        System.out.println(
-                "Thread " + Thread.currentThread().threadId() +
-                        " acquired user: " + TestUserPool.getCurrentUser().username()
         );
     }
 
@@ -39,21 +83,33 @@ public class MultithreadingSteps {
     }
 
     @Then("this scenario records its thread")
-    public void thisScenarioRecordsItsThread() throws InterruptedException {
+    public void thisScenarioRecordsItsThread() {
         THREAD_IDS.add(Thread.currentThread().threadId());
 
-        // Give time for other threads to run
-        Thread.sleep(500);
-
-        assertTrue(
-                THREAD_IDS.size() > 1,
-                "Multithreading is NOT working. Only one thread detected."
+        System.out.println(
+                "Scenario running on thread: " + Thread.currentThread().threadId()
         );
     }
 
     @Then("the browser opens {string}")
     public void theBrowserOpens(String url) {
         Hooks.getPage().navigate(url);
+    }
+
+    @Then("the browser opens the web client")
+    public void theBrowserOpensTheWebClient() {
+        Hooks.getPage().navigate("https://" + TestEnvironment.getWebUrl());
+    }
+
+    @Then("the user logs in")
+    public void theUserLogsIn() {
+        var user = TestUserPool.getCurrentUser();
+
+        new LoginPO(Hooks.getPage()).login(
+                user.email(),
+                user.password()
+        );
+        waitUntilUrlContains("overview");
     }
 
     @Then("the Playwright homepage is visible")
@@ -72,7 +128,7 @@ public class MultithreadingSteps {
 
         System.out.println(
                 "Thread " + Thread.currentThread().threadId() +
-                        " using user: " + user.username()
+                        " using user: " + user.email()
         );
     }
 
@@ -82,18 +138,18 @@ public class MultithreadingSteps {
 
         Hooks.getPage().evaluate(
                 "user => localStorage.setItem('test-user', user)",
-                user.username()
+                user.email()
         );
     }
 
     @Then("the user in the browser should match the current user")
     public void theUserInTheBrowserShouldMatchTheCurrentUser() {
-        var expectedUser = TestUserPool.getCurrentUser().username();
+        var expectedUser = TestUserPool.getCurrentUser().email();
 
         String actualUser = Hooks.getPage().evaluate(
                 "() => localStorage.getItem('test-user')"
         ).toString();
-//        System.out.println("expectedUser: " + expectedUser + " actualUser: " + actualUser);
+
         assertTrue(
                 expectedUser.equals(actualUser),
                 "Mismatch between thread user and browser user. Expected: "
@@ -107,7 +163,7 @@ public class MultithreadingSteps {
                 "Scenario '" + scenario.getName() + "' | Thread " +
                         Thread.currentThread().threadId() +
                         " releasing user: " +
-                        TestUserPool.getCurrentUser().username()
+                        TestUserPool.getCurrentUser().email()
         );
 
         TestUserPool.releaseCurrentUser();

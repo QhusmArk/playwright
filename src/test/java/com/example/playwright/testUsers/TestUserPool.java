@@ -1,5 +1,6 @@
 package com.example.playwright.testUsers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -7,28 +8,48 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class TestUserPool {
 
     private static final ThreadLocal<TestUser> CURRENT_USER = new ThreadLocal<>();
-    private static final ConcurrentLinkedQueue<TestUser> AVAILABLE_USERS = new ConcurrentLinkedQueue<>();
+    private static final Object LOCK = new Object();
 
+    private static final List<TestUser> AVAILABLE_USERS = new ArrayList<>();
     static {
-        // Initialize pool (you can later replace with real users)
-        AVAILABLE_USERS.addAll(List.of(
-                new TestUser("user1", "password"),
-                new TestUser("user2", "password")
-        ));
+        AVAILABLE_USERS.addAll(TestUserLoader.loadUsers());
     }
 
     public static Optional<TestUser> acquireUser() {
-        TestUser user = AVAILABLE_USERS.poll();
-        if (user != null) {
+        synchronized (LOCK) {
+            if (AVAILABLE_USERS.isEmpty()) {
+                return Optional.empty();
+            }
+
+            TestUser user = AVAILABLE_USERS.removeFirst();
             CURRENT_USER.set(user);
+            return Optional.of(user);
         }
-        return Optional.ofNullable(user);
     }
 
-    public static void releaseUser(TestUser user) {
-        if (user != null) {
-            AVAILABLE_USERS.offer(user);
-            CURRENT_USER.remove();
+    public static TestUser acquireUserWithRole(String role) {
+        synchronized (LOCK) {
+            while (true) {
+                for (int i = 0; i < AVAILABLE_USERS.size(); i++) {
+                    TestUser user = AVAILABLE_USERS.get(i);
+
+                    if (user.role().equalsIgnoreCase(role)) {
+                        AVAILABLE_USERS.remove(i);
+                        CURRENT_USER.set(user);
+                        return user;
+                    }
+                }
+
+                try {
+                    LOCK.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(
+                            "Interrupted while waiting for test user with role: " + role,
+                            e
+                    );
+                }
+            }
         }
     }
 
@@ -37,11 +58,15 @@ public class TestUserPool {
     }
 
     public static void releaseCurrentUser() {
-        TestUser user = CURRENT_USER.get();
+        synchronized (LOCK) {
+            TestUser user = CURRENT_USER.get();
 
-        if (user != null) {
-            AVAILABLE_USERS.offer(user);
-            CURRENT_USER.remove();
+            if (user != null) {
+                AVAILABLE_USERS.add(user);
+                CURRENT_USER.remove();
+
+                LOCK.notifyAll(); // wake waiting threads
+            }
         }
     }
 }
