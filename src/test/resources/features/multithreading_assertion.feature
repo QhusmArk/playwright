@@ -32,12 +32,9 @@ Feature: Multithreading assertion
 
   @user
   Scenario: Make navigation
-    And the browser opens the web client
-    And the user logs in
     When I navigate to account 'devices'
+    Then I validate url contains 'devices'
 
   @loginWithAdmin
-  Scenario: Make navigation
-    And the browser opens the web client
-    And the user logs in
+  Scenario: Make manual login
     When I navigate to account 'devices'

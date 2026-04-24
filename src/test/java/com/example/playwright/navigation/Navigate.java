@@ -2,6 +2,7 @@ package com.example.playwright.navigation;
 
 import com.example.playwright.config.TestEnvironment;
 import com.example.playwright.steps.Hooks;
+import com.microsoft.playwright.TimeoutError;
 
 public class Navigate {
 
@@ -11,8 +12,12 @@ public class Navigate {
         path.append(start);
     }
 
+    public static String webUrl() {
+        return TestEnvironment.getWebUrl();
+    }
+
     private static String base() {
-        return "https://" + TestEnvironment.getWebUrl() + "/";
+        return "https://" + webUrl() + "/";
     }
 
     /***************************** Starters **************************/
@@ -51,6 +56,11 @@ public class Navigate {
         return this;
     }
 
+    public Navigate users() {
+        path.append("/users");
+        return this;
+    }
+
     public void get() {
         Hooks.getPage().navigate(path.toString());
     }
@@ -63,5 +73,17 @@ public class Navigate {
 
     public static void waitUntilUrlContains(String value) {
         Hooks.getPage().waitForURL(url -> url.contains(value));
+    }
+
+    public static void validateUrlContains(String value) {
+        try {
+            Hooks.getPage().waitForURL(url -> url.contains(value));
+        } catch (TimeoutError e) {
+            throw new RuntimeException("Timed out waiting for URL: " + value);
+        }
+    }
+
+    public static void refreshBrowser() {
+        Hooks.getPage().reload();
     }
 }
