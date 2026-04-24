@@ -48,13 +48,4 @@ public class Hooks {
         if (browser.get() != null) browser.get().close();
         if (playwright.get() != null) playwright.get().close();
     }
-
-    public static String getCurrentUrl() {
-        return page.get().url();
-    }
-
-    public static void waitUntilUrlContains(String value) {
-        page.get().waitForURL(url -> url.contains(value));
-        System.out.println("URL matched: " + page.get().url());
-    }
 }

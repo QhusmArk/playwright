@@ -1,6 +1,7 @@
 package com.example.playwright.steps;
 
 import com.example.playwright.config.TestEnvironment;
+import com.example.playwright.navigation.Navigate;
 import com.example.playwright.pageObjects.LoginPO;
 import com.example.playwright.testUsers.TestUserPool;
 import io.cucumber.java.After;
@@ -13,7 +14,6 @@ import io.cucumber.java.en.When;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.example.playwright.steps.Hooks.waitUntilUrlContains;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultithreadingSteps {
@@ -91,14 +91,9 @@ public class MultithreadingSteps {
         );
     }
 
-    @Then("the browser opens {string}")
-    public void theBrowserOpens(String url) {
-        Hooks.getPage().navigate(url);
-    }
-
     @Then("the browser opens the web client")
     public void theBrowserOpensTheWebClient() {
-        Hooks.getPage().navigate("https://" + TestEnvironment.getWebUrl());
+        Navigate.domain().get();
     }
 
     @Then("the user logs in")
@@ -109,17 +104,7 @@ public class MultithreadingSteps {
                 user.email(),
                 user.password()
         );
-        waitUntilUrlContains("overview");
-    }
-
-    @Then("the Playwright homepage is visible")
-    public void thePlaywrightHomepageIsVisible() {
-        String title = Hooks.getPage().title();
-
-        assertTrue(
-                title.contains("Playwright"),
-                "Expected Playwright page title, but got: " + title
-        );
+        Navigate.waitUntilUrlContains("overview");
     }
 
     @Then("the current user is printed")
@@ -132,30 +117,30 @@ public class MultithreadingSteps {
         );
     }
 
-    @Then("the user is stored in the browser")
-    public void theUserIsStoredInTheBrowser() {
-        var user = TestUserPool.getCurrentUser();
-
-        Hooks.getPage().evaluate(
-                "user => localStorage.setItem('test-user', user)",
-                user.email()
-        );
-    }
-
-    @Then("the user in the browser should match the current user")
-    public void theUserInTheBrowserShouldMatchTheCurrentUser() {
-        var expectedUser = TestUserPool.getCurrentUser().email();
-
-        String actualUser = Hooks.getPage().evaluate(
-                "() => localStorage.getItem('test-user')"
-        ).toString();
-
-        assertTrue(
-                expectedUser.equals(actualUser),
-                "Mismatch between thread user and browser user. Expected: "
-                        + expectedUser + " but got: " + actualUser
-        );
-    }
+//    @Then("the user is stored in the browser")
+//    public void theUserIsStoredInTheBrowser() {
+//        var user = TestUserPool.getCurrentUser();
+//
+//        Hooks.getPage().evaluate(
+//                "user => localStorage.setItem('test-user', user)",
+//                user.email()
+//        );
+//    }
+//
+//    @Then("the user in the browser should match the current user")
+//    public void theUserInTheBrowserShouldMatchTheCurrentUser() {
+//        var expectedUser = TestUserPool.getCurrentUser().email();
+//
+//        String actualUser = Hooks.getPage().evaluate(
+//                "() => localStorage.getItem('test-user')"
+//        ).toString();
+//
+//        assertTrue(
+//                expectedUser.equals(actualUser),
+//                "Mismatch between thread user and browser user. Expected: "
+//                        + expectedUser + " but got: " + actualUser
+//        );
+//    }
 
     @After
     public void releaseTestUser(Scenario scenario) {
