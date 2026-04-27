@@ -8,6 +8,7 @@ import com.example.playwright.testUsers.TestUserPool;
 import com.microsoft.playwright.options.Cookie;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.BeforeStep;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -22,8 +23,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultithreadingSteps {
+    private int step = 1;
 
     private static final Set<Long> THREAD_IDS = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Method that runs before each step. Used in Jenkins job log to track steps.
+     */
+    @BeforeStep
+    public void beforeStep() {
+        System.out.println("*********** Starting step " + step + " ***********");
+        step++;
+    }
 
     @Before(order = 1)
     public void acquireUserWithRole(Scenario scenario) {
@@ -43,55 +54,6 @@ public class MultithreadingSteps {
     }
 
     @Before(order = 3)
-//    public void prepareLoginSession(Scenario scenario) {
-//        TestUser currentUser = TestUserPool.getCurrentUser();
-//
-//        Navigate.domain().get();
-//
-//        if (isManualLoginScenario(scenario)) {
-//
-//            loginCurrentUser();
-//
-//        } else {
-//
-//            Optional<Cookie> optCookie = SessionCookieManager.loadSessionCookie(currentUser);
-//
-//            // Is for this user?
-//            if (optCookie.isPresent()) {
-//                Cookie cookie = optCookie.get();
-//
-//                // Is for this domain?
-//                String webUrl = Navigate.webUrl();
-//                if (cookie.domain.equals(webUrl))  {
-//
-//                    // Has not expired?
-//                    long millis = (long) (cookie.expires * 1000);
-//                    Instant cookieExpiry = Instant.ofEpochMilli(millis);
-//
-//                    if (Instant.now().isBefore(cookieExpiry)) {
-//                        Hooks.addCookie(cookie);
-//                        Navigate.refreshBrowser();
-//                        // After this step some navigation to beyond /login has to be made
-//
-//                    } else {
-//                        loginCurrentUser();
-//                    }
-//                } else {
-//                    loginCurrentUser();
-//                }
-//            } else {
-//                loginCurrentUser();
-//            }
-//        }
-//
-//        if (!isManualLoginScenario(scenario)) {
-//            Cookie sessionid = Hooks.getCookie("sessionid");
-//            SessionCookieManager.saveSessionCookie(
-//                    currentUser,
-//                    sessionid
-//            );
-//        }
-//    }
     public void prepareLoginSession(Scenario scenario) {
         TestUser currentUser = TestUserPool.getCurrentUser();
 
@@ -113,6 +75,7 @@ public class MultithreadingSteps {
 
                 if (correctDomain && hasNotExpired) {
 
+                    // If all checks, add a cookie to avoid manual login
                     Hooks.addCookie(cookie);
                     // Navigation has to be done for cookie to guide us past /login
                 } else  {

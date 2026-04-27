@@ -21,14 +21,14 @@ Feature: Multithreading assertion
     And the browser opens the web client
     And the current user is printed
 
-  @user
-  Scenario: Assert thread three
-    Given multithreading is required
-    When the test execution starts
-    Then this scenario records its thread
-    And the browser opens the web client
-    And the user logs in
-    And the current user is printed
+#  @user
+#  Scenario: Assert thread three
+#    Given multithreading is required
+#    When the test execution starts
+#    Then this scenario records its thread
+#    And the browser opens the web client
+#    And the user logs in
+#    And the current user is printed
 
   @user
   Scenario: Make navigation

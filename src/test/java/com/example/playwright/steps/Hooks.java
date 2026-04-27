@@ -15,10 +15,6 @@ public class Hooks {
     protected static final ThreadLocal<BrowserContext> context = new ThreadLocal<>();
     protected static final ThreadLocal<Page> page = new ThreadLocal<>();
 
-    public static Page getPage() {
-        return page.get();
-    }
-
     @Before(order = 2)
     public void setUp() {
         Playwright pw = Playwright.create();
@@ -26,7 +22,7 @@ public class Hooks {
 
         Browser br = pw.chromium().launch(
                 new BrowserType.LaunchOptions()
-                        .setHeadless(false)
+                        .setHeadless(true)
                         .setSlowMo(300) //     wait 300 milliseconds after each action
                         .setArgs(List.of("--window-size=900,700"))
         );
@@ -41,6 +37,10 @@ public class Hooks {
 
         Page pg = ctx.newPage();
         page.set(pg);
+    }
+
+    public static Page getPage() {
+        return page.get();
     }
 
     public static BrowserContext getContext() {
@@ -60,7 +60,7 @@ public class Hooks {
         context.get().addCookies(List.of(cookie));
     }
 
-    @After
+    @After(order = 1)
     public void tearDown() {
         if (page.get() != null) page.get().close();
         if (context.get() != null) context.get().close();
