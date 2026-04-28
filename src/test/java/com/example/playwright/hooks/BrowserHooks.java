@@ -1,14 +1,17 @@
-package com.example.playwright.steps;
+package com.example.playwright.hooks;
 
 import com.example.playwright.helpers.PlaywrightActions;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.Cookie;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.BeforeStep;
 
 import java.util.List;
 
-public class Hooks {
+public class BrowserHooks {
+
+    private int step = 1;
 
     protected static final ThreadLocal<Playwright> playwright = new ThreadLocal<>();
     protected static final ThreadLocal<Browser> browser = new ThreadLocal<>();
@@ -67,6 +70,15 @@ public class Hooks {
     public static void addCookie(Cookie cookie) {
         System.out.println("Adding cookie.");
         context.get().addCookies(List.of(cookie));
+    }
+
+    /**
+     * Method that runs before each step. Used in Jenkins job log to track steps.
+     */
+    @BeforeStep
+    public void beforeStep() {
+        System.out.println("*********** Starting step " + step + " ***********");
+        step++;
     }
 
     @After(order = 1)

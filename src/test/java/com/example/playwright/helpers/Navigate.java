@@ -2,7 +2,7 @@ package com.example.playwright.helpers;
 
 import com.example.playwright.config.TestEnvironment;
 import com.example.playwright.enums.DeviceType;
-import com.example.playwright.steps.Hooks;
+import com.example.playwright.hooks.BrowserHooks;
 import com.microsoft.playwright.TimeoutError;
 
 import java.util.stream.IntStream;
@@ -17,7 +17,7 @@ public class Navigate {
 
     public void get() {
         System.out.println("\nNavigating to:\n -> " + path.toString());
-        Hooks.getPage().navigate(path.toString());
+        BrowserHooks.getPage().navigate(path.toString());
     }
 
     public static String webUrl() {
@@ -442,22 +442,22 @@ public class Navigate {
     /***************************** Helpers **************************/
 
     public static String getCurrentUrl() {
-        return Hooks.getPage().url();
+        return BrowserHooks.getPage().url();
     }
 
     public static void waitUntilUrlContains(String value) {
-        Hooks.getPage().waitForURL(url -> url.contains(value));
+        BrowserHooks.getPage().waitForURL(url -> url.contains(value));
     }
 
     public static void validateUrlContains(String value) {
         try {
-            Hooks.getPage().waitForURL(url -> url.contains(value));
+            BrowserHooks.getPage().waitForURL(url -> url.contains(value));
         } catch (TimeoutError e) {
             throw new RuntimeException("Timed out waiting for URL: " + value);
         }
     }
 
     public static void refreshBrowser() {
-        Hooks.getPage().reload();
+        BrowserHooks.getPage().reload();
     }
 }

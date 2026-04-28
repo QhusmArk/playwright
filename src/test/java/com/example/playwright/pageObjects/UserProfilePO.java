@@ -7,7 +7,6 @@ public class UserProfilePO extends BasePO {
     }
 
     public void enterUserFirstName(String value) {
-//        PlaywrightActions.sleep(1);
         actions().clearAndType("//input[@data-qa-id='first_name']", value);
     }
 }

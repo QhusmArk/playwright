@@ -37,7 +37,6 @@ public class CommonElementsPO extends BasePO {
      */
     public List<String> getToasts() {
         //Give time for more than "Creating temporary report" to show.
-//        PlaywrightActions.sleep(4);
 
         if (actions().elementExistAndVisible("//div[@class='q-notification__message col']", false)) {
             // Collect the messages into a list
