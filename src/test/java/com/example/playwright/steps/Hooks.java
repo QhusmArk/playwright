@@ -1,10 +1,10 @@
 package com.example.playwright.steps;
 
+import com.example.playwright.helpers.PlaywrightActions;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.Cookie;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
-import com.microsoft.playwright.BrowserContext;
 
 import java.util.List;
 
@@ -14,6 +14,7 @@ public class Hooks {
     protected static final ThreadLocal<Browser> browser = new ThreadLocal<>();
     protected static final ThreadLocal<BrowserContext> context = new ThreadLocal<>();
     protected static final ThreadLocal<Page> page = new ThreadLocal<>();
+    protected static final ThreadLocal<PlaywrightActions> actions = new ThreadLocal<>();
 
     @Before(order = 2)
     public void setUp() {
@@ -23,6 +24,7 @@ public class Hooks {
         Browser br = pw.chromium().launch(
                 new BrowserType.LaunchOptions()
                         .setHeadless(true)
+//                        .setHeadless(false)
                         .setSlowMo(300) //     wait 300 milliseconds after each action
                         .setArgs(List.of("--window-size=900,700"))
         );
@@ -37,6 +39,8 @@ public class Hooks {
 
         Page pg = ctx.newPage();
         page.set(pg);
+
+        actions.set(new PlaywrightActions(pg));
     }
 
     public static Page getPage() {
@@ -45,6 +49,10 @@ public class Hooks {
 
     public static BrowserContext getContext() {
         return context.get();
+    }
+
+    public static PlaywrightActions getActions() {
+        return actions.get();
     }
 
     public static Cookie getCookie(String name) {
@@ -57,6 +65,7 @@ public class Hooks {
     }
 
     public static void addCookie(Cookie cookie) {
+        System.out.println("Adding cookie.");
         context.get().addCookies(List.of(cookie));
     }
 
@@ -66,5 +75,11 @@ public class Hooks {
         if (context.get() != null) context.get().close();
         if (browser.get() != null) browser.get().close();
         if (playwright.get() != null) playwright.get().close();
+
+        page.remove();
+        context.remove();
+        browser.remove();
+        playwright.remove();
+        actions.remove();
     }
 }

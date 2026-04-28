@@ -1,23 +1,15 @@
 package com.example.playwright.pageObjects;
 
-import com.microsoft.playwright.Page;
-
-public class LoginPO {
-
-    private final Page page;
-
-    public LoginPO(Page page) {
-        this.page = page;
-    }
+public class LoginPO extends BasePO {
 
     public void login(String email, String password) {
         // Enter email
-        page.locator("//form //input[@name='username']").fill(email);
+        actions().clearAndType("//form //input[@name='username']", email);
 
         // Enter password
-        page.locator("//form //input[@name='password']").fill(password);
+        actions().clearAndType("//form //input[@name='password']", password);
 
         // Click submit
-        page.locator("//form //input[@name='submit']").click();
+        actions().click("//form //input[@name='submit']");
     }
 }

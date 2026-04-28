@@ -3,7 +3,6 @@ package com.example.playwright.testUsers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TestUserPool {
 
@@ -11,6 +10,7 @@ public class TestUserPool {
     private static final Object LOCK = new Object();
 
     private static final List<TestUser> AVAILABLE_USERS = new ArrayList<>();
+
     static {
         AVAILABLE_USERS.addAll(TestUserLoader.loadUsers());
     }

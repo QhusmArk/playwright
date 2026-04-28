@@ -1,7 +1,6 @@
 package com.example.playwright.steps;
 
-import com.example.playwright.navigation.Navigate;
-import com.example.playwright.pageObjects.LoginPO;
+import com.example.playwright.helpers.Navigate;
 import com.example.playwright.session.SessionCookieManager;
 import com.example.playwright.testUsers.TestUser;
 import com.example.playwright.testUsers.TestUserPool;
@@ -10,22 +9,14 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeStep;
 import io.cucumber.java.Scenario;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import io.cucumber.messages.types.Hook;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public class MultithreadingSteps {
+public class MultithreadingSteps extends BaseGlue {
     private int step = 1;
 
-    private static final Set<Long> THREAD_IDS = ConcurrentHashMap.newKeySet();
+//    private static final Set<Long> THREAD_IDS = ConcurrentHashMap.newKeySet();
 
     /**
      * Method that runs before each step. Used in Jenkins job log to track steps.
@@ -45,12 +36,7 @@ public class MultithreadingSteps {
                 ? TestUserPool.acquireUserWithRole(requiredRole)
                 : TestUserPool.acquireUser()
                 .orElseThrow(() -> new RuntimeException("No available test users in pool"));
-
-        System.out.println(
-                "Thread " + Thread.currentThread().threadId() +
-                        " acquired user: " + user.email() +
-                        " with role: " + user.role()
-        );
+        System.out.println("user: " + user.email());
     }
 
     @Before(order = 3)
@@ -72,13 +58,18 @@ public class MultithreadingSteps {
 
                 boolean correctDomain = forThisDomain(optCookie.get());
                 boolean hasNotExpired = hasExpired(optCookie.get());
-
                 if (correctDomain && hasNotExpired) {
-
                     // If all checks, add a cookie to avoid manual login
                     Hooks.addCookie(cookie);
-                    // Navigation has to be done for cookie to guide us past /login
-                } else  {
+                    // Now when we have a cookie, and this navigation leads to .../account/overview
+                    Navigate.domain().get();
+
+                    boolean sessionHasExpired = cePO.isSessionExpired();
+
+                    if (sessionHasExpired) {
+                        loginAndStoreCookie(currentUser);
+                    }
+                } else {
                     loginAndStoreCookie(currentUser);
                 }
             } else {
@@ -150,91 +141,19 @@ public class MultithreadingSteps {
         return role;
     }
 
-    @Given("multithreading is required")
-    public void multithreadingIsRequired() {
-        assertTrue(
-                Runtime.getRuntime().availableProcessors() > 1,
-                "Multithreading cannot be used because only one processor is available."
-        );
-    }
-
-    @When("the test execution starts")
-    public void theTestExecutionStarts() {
-        THREAD_IDS.add(Thread.currentThread().threadId());
-    }
-
-    @Then("this scenario records its thread")
-    public void thisScenarioRecordsItsThread() {
-        THREAD_IDS.add(Thread.currentThread().threadId());
-
-        System.out.println(
-                "Scenario running on thread: " + Thread.currentThread().threadId()
-        );
-    }
-
-    @Then("the browser opens the web client")
-    public void theBrowserOpensTheWebClient() {
-        Navigate.domain().get();
-    }
-
-    @Then("the user logs in")
-    public void theUserLogsIn() {
-        loginCurrentUser();
-    }
-
-    @Then("the current user is printed")
-    public void theCurrentUserIsPrinted() {
-        var user = TestUserPool.getCurrentUser();
-
-        System.out.println(
-                "Thread " + Thread.currentThread().threadId() +
-                        " using user: " + user.email()
-        );
-    }
-
-//    @Then("the user is stored in the browser")
-//    public void theUserIsStoredInTheBrowser() {
-//        var user = TestUserPool.getCurrentUser();
-//
-//        Hooks.getPage().evaluate(
-//                "user => localStorage.setItem('test-user', user)",
-//                user.email()
-//        );
-//    }
-//
-//    @Then("the user in the browser should match the current user")
-//    public void theUserInTheBrowserShouldMatchTheCurrentUser() {
-//        var expectedUser = TestUserPool.getCurrentUser().email();
-//
-//        String actualUser = Hooks.getPage().evaluate(
-//                "() => localStorage.getItem('test-user')"
-//        ).toString();
-//
-//        assertTrue(
-//                expectedUser.equals(actualUser),
-//                "Mismatch between thread user and browser user. Expected: "
-//                        + expectedUser + " but got: " + actualUser
-//        );
-//    }
-
     private void loginCurrentUser() {
         var user = TestUserPool.getCurrentUser();
-        new LoginPO(Hooks.getPage()).login(
+
+        loginPO.login(
                 user.email(),
                 user.password()
         );
+
         Navigate.waitUntilUrlContains("overview");
     }
 
     @After
     public void releaseTestUser(Scenario scenario) {
-        System.out.println(
-                "Scenario '" + scenario.getName() + "' | Thread " +
-                        Thread.currentThread().threadId() +
-                        " releasing user: " +
-                        TestUserPool.getCurrentUser().email()
-        );
-
         TestUserPool.releaseCurrentUser();
     }
 }

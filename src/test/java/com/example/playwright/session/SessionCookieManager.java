@@ -61,5 +61,6 @@ public class SessionCookieManager {
                 .replace("@sigicom.com", "")
                 .replaceAll("_$", "");
 
-        return emailPrefix + "_session_cookie.json";    }
+        return emailPrefix + "_session_cookie.json";
+    }
 }

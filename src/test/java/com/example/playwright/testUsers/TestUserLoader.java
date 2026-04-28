@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class TestUserLoader {
 
-    private static final String FILE_NAME = "test_env.properties";
+    private static final String FILE_NAME_USERS = "test_env_users.properties";
 
     public static List<TestUser> loadUsers() {
         Properties properties = loadProperties();
@@ -28,17 +28,17 @@ public class TestUserLoader {
 
         try (InputStream inputStream = TestUserLoader.class
                 .getClassLoader()
-                .getResourceAsStream(FILE_NAME)) {
+                .getResourceAsStream(FILE_NAME_USERS)) {
 
             if (inputStream == null) {
-                throw new IllegalStateException("Could not find " + FILE_NAME + " in test resources.");
+                throw new IllegalStateException("Could not find " + FILE_NAME_USERS + " in test resources.");
             }
 
             properties.load(inputStream);
             return properties;
 
         } catch (IOException e) {
-            throw new IllegalStateException("Could not load " + FILE_NAME, e);
+            throw new IllegalStateException("Could not load " + FILE_NAME_USERS, e);
         }
     }
 
@@ -59,6 +59,37 @@ public class TestUserLoader {
 
         if (value == null || value.isBlank()) {
             throw new IllegalStateException("Missing required property: " + key);
+        }
+
+        return value;
+    }
+
+    /**
+     * Returns the shared API admin user.
+     */
+    /**
+     * Returns the shared API user.
+     */
+    public static TestUser createApiUser() {
+        String email = getRequiredProperty("api.user.email");
+        String role = getRequiredProperty("api.user.role");
+        int id = Integer.parseInt(getRequiredProperty("api.user.id"));
+        String password = getRequiredProperty("api.user.password");
+        String token = getRequiredProperty("api.user.token");
+
+        return new TestUser(email, role, id, password, token);
+    }
+
+    /**
+     * Returns a required property value.
+     */
+    private static String getRequiredProperty(String key) {
+        Properties properties = new Properties();
+
+        String value = properties.getProperty(key);
+
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("Missing required user property: " + key);
         }
 
         return value;

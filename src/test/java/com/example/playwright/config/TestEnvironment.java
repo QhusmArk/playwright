@@ -6,11 +6,15 @@ import java.util.Properties;
 
 public class TestEnvironment {
 
-    private static final String FILE_NAME = "test_env.properties";
+    private static final String FILE_NAME = "test_env_users.properties";
     private static final Properties PROPERTIES = loadProperties();
 
     public static String getWebUrl() {
         return required("WEB_URL");
+    }
+
+    public static String getApiUrl() {
+        return required("API_URL");
     }
 
     private static Properties loadProperties() {

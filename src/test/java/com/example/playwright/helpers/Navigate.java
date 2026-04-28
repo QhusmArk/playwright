@@ -1,6 +1,7 @@
-package com.example.playwright.navigation;
+package com.example.playwright.helpers;
 
 import com.example.playwright.config.TestEnvironment;
+import com.example.playwright.enums.DeviceType;
 import com.example.playwright.steps.Hooks;
 import com.microsoft.playwright.TimeoutError;
 
@@ -15,12 +16,10 @@ public class Navigate {
     }
 
     public void get() {
+        System.out.println("\nNavigating to:\n -> " + path.toString());
         Hooks.getPage().navigate(path.toString());
     }
 
-    
-    
-    
     public static String webUrl() {
         return TestEnvironment.getWebUrl();
     }
@@ -32,15 +31,15 @@ public class Navigate {
     /***************************** Starters **************************/
 
     public static Navigate domain() {
-        return new Navigate(base() + "/");
+        return new Navigate(base());
     }
 
     public static Navigate company() {
-        return new Navigate(base() + "/" + "#/company");
+        return new Navigate(base() + "#/company");
     }
 
     public static Navigate project(final int projectId) {
-        return new Navigate(base() + "/" + "#/project/" + projectId);
+        return new Navigate(base() + "#/project/" + projectId);
     }
 
     /***************************** Endpoints **************************/
@@ -75,10 +74,10 @@ public class Navigate {
         return this;
     }
 
-//    public Navigate device(final DeviceType type, final int id) {
-//        path.append("/devices/").append(type.getUrl()).append("/").append(id);
-//        return this;
-//    }
+    public Navigate device(final DeviceType type, final int id) {
+        path.append("/devices/").append(type.getUrl()).append("/").append(id);
+        return this;
+    }
 
     public Navigate device(String type, final String id) {
         type = (type.equals("C10_LOGGER") || type.equals("C12_LOGGER"))
@@ -89,10 +88,10 @@ public class Navigate {
         return this;
     }
 
-//    public Navigate device(final DeviceType type, final String id) {
-//        path.append("/devices/").append(type.getUrl()).append("/").append(id);
-//        return this;
-//    }
+    public Navigate device(final DeviceType type, final String id) {
+        path.append("/devices/").append(type.getUrl()).append("/").append(id);
+        return this;
+    }
 
     public Navigate user(final int id) {
         path.append("/users").append("/").append(id);
@@ -248,14 +247,15 @@ public class Navigate {
     }
 
     public Navigate transients(final int id, final String analysisId) {
-        String escapedAnalysisId = analysisId.replace("+","%2B");
+        String escapedAnalysisId = analysisId.replace("+", "%2B");
         path.append("/transients/").append(id).append("?tr_ids=").append(escapedAnalysisId);
         return this;
     }
+
     public Navigate transients(final int id, final String analysisId1, final String analysisId2, final String analysisId3) {
-        String escapedAnalysisId1 = analysisId1.replace("+","%2B");
-        String escapedAnalysisId2 = analysisId2.replace("+","%2B");
-        String escapedAnalysisId3 = analysisId3.replace("+","%2B");
+        String escapedAnalysisId1 = analysisId1.replace("+", "%2B");
+        String escapedAnalysisId2 = analysisId2.replace("+", "%2B");
+        String escapedAnalysisId3 = analysisId3.replace("+", "%2B");
 
         path.append("/transients/").append(id)
                 .append("?tr_ids=").append(escapedAnalysisId1)
