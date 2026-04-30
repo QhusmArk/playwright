@@ -2,6 +2,7 @@ package com.example.playwright.helpers;
 
 import com.example.playwright.config.TestEnvironment;
 import com.example.playwright.enums.DeviceType;
+import com.example.playwright.enums.ProviderType;
 import com.example.playwright.hooks.BrowserHooks;
 import com.microsoft.playwright.TimeoutError;
 
@@ -61,6 +62,11 @@ public class Navigate {
 
     public Navigate projects() {
         path.append("/projects");
+        return this;
+    }
+
+    public Navigate project() {
+        path.append("/project");
         return this;
     }
 
@@ -438,6 +444,26 @@ public class Navigate {
         path.append("/active-channels");
         return this;
     }
+
+    public Navigate provider(ProviderType provider) {
+        return switch (provider) {
+            // company level = projects, project level = project
+            case PROJECT -> path.toString().contains("company")
+                    ? projects()
+                    : project();
+            case MEASURING_POINT -> measurePoints();
+            case BLAST -> blasts();
+            case DEVICE -> devices();
+            case DATA_REPORT -> views();
+            case MESSAGE_RULE -> messageRules();
+            case USER -> users();
+            case COMMENT -> comments();
+            case OVERVIEW -> overview();
+            case BILLING_REPORT -> billingReports().create();
+            default -> throw new IllegalArgumentException("Unknown provider " + provider);
+        };
+    }
+
 
     /***************************** Helpers **************************/
 

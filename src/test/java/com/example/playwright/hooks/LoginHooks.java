@@ -1,10 +1,9 @@
 package com.example.playwright.hooks;
 
 import com.example.playwright.helpers.Navigate;
-import com.example.playwright.session.SessionCookieManager;
+import com.example.playwright.hooks.testUsers.TestUser;
+import com.example.playwright.hooks.testUsers.TestUserPool;
 import com.example.playwright.steps.BaseGlue;
-import com.example.playwright.testUsers.TestUser;
-import com.example.playwright.testUsers.TestUserPool;
 import com.microsoft.playwright.options.Cookie;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -39,7 +38,7 @@ public class LoginHooks extends BaseGlue {
                     // Now when we have a cookie, and this navigation leads to .../account/overview
                     Navigate.domain().get();
 
-                    boolean sessionHasExpired = cePO.isSessionExpired();
+                    boolean sessionHasExpired = loginPO.isSessionExpired();
 
                     if (sessionHasExpired) {
                         loginAndStoreCookie(currentUser);

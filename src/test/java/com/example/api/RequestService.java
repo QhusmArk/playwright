@@ -1,8 +1,8 @@
 package com.example.api;
 
 import com.example.playwright.config.TestEnvironment;
-import com.example.playwright.testUsers.TestUser;
-import com.example.playwright.testUsers.TestUserLoader;
+import com.example.playwright.config.TestUserLoader;
+import com.example.playwright.hooks.testUsers.TestUser;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.parsing.Parser;
