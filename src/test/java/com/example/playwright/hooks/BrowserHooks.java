@@ -38,7 +38,7 @@ public class BrowserHooks {
                         .setIgnoreHTTPSErrors(true)
                         .setPermissions(List.of()) // no permissions granted
         );
-        context.set(ctx);
+        context().set(ctx);
 
         Page pg = ctx.newPage();
         page.set(pg);
@@ -51,7 +51,7 @@ public class BrowserHooks {
     }
 
     public static BrowserContext getContext() {
-        return context.get();
+        return context().get();
     }
 
     public static PlaywrightActions getActions() {
@@ -59,17 +59,21 @@ public class BrowserHooks {
     }
 
     public static Cookie getCookie(String name) {
-        var cookies = context.get().cookies();
+        var cookies = context().get().cookies();
 
+//        return cookies.stream()
+//                .filter(c -> c.name.equals(name))
+//                .findFirst()
+//                .orElseThrow(() -> new RuntimeException("Cookie not found: " + name));
         return cookies.stream()
                 .filter(c -> c.name.equals(name))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Cookie not found: " + name));
+                .orElse(null);
     }
 
     public static void addCookie(Cookie cookie) {
         System.out.println("Adding cookie.");
-        context.get().addCookies(List.of(cookie));
+        context().get().addCookies(List.of(cookie));
     }
 
     /**
@@ -84,12 +88,12 @@ public class BrowserHooks {
     @After(order = 1)
     public void tearDown() {
         if (page.get() != null) page.get().close();
-        if (context.get() != null) context.get().close();
+        if (context().get() != null) context().get().close();
         if (browser.get() != null) browser.get().close();
         if (playwright.get() != null) playwright.get().close();
 
         page.remove();
-        context.remove();
+        context().remove();
         browser.remove();
         playwright.remove();
         actions.remove();

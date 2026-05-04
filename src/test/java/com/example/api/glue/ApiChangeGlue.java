@@ -8,8 +8,8 @@ import com.example.api.models.device.Logger;
 import com.example.helpers.hardware.JenkinsDeviceSSHConnector;
 import com.example.helpers.testData.Context;
 import com.example.playwright.config.DeviceProperties;
-import com.example.playwright.enums.DeviceType;
 import com.example.playwright.helpers.PlaywrightActions;
+import com.example.playwright.helpers.enums.DeviceType;
 import com.example.playwright.steps.BaseGlue;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
@@ -218,7 +218,7 @@ public class ApiChangeGlue extends BaseGlue {
         for (int s = 1; s <= timeToWait; s++) {
             System.out.println("\n" + s + ":200 Polling for new settings in device.");
 
-//            Device device = DeviceApi.getAboutDevice("C22", Integer.parseInt(Settings.getConnectedSerial("C22")));
+//            Device device = DeviceApi.getAboutDevice("C22", Integer.parseInt(DeviceProperties.getConnectedSerial("C22")));
             Device device = DeviceApi.getDevice("C22", Integer.parseInt(DeviceProperties.getConnectedSerial("C22")));
 
             String currentConfigId = device.getConfigId();

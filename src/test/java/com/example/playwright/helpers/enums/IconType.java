@@ -186,7 +186,7 @@ public enum IconType {
      * @param providerIconText, either empty or has text from the webelement
      */
     public static IconType fromWebElement(String providerIconClassName, String providerIconText) {
-        if (providerIconText.isEmpty()) {
+        if (providerIcontext().isEmpty()) {
             return IconType.fromClassName(providerIconClassName);
         } else {
             return IconType.fromClassName(providerIconText);

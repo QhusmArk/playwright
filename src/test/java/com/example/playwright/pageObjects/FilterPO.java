@@ -1,13 +1,13 @@
 package com.example.playwright.pageObjects;
 
+import com.example.helpers.StatusAssesser;
+import com.example.playwright.components.parts.FilterItem;
 import com.example.playwright.helpers.enums.FilterType;
 import com.example.playwright.helpers.enums.ProviderType;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.example.playwright.helpers.enums.ProviderType.DEVICE;
 
@@ -26,12 +26,6 @@ public class FilterPO extends CommonPO {
 
     static final String SEARCH = "//div[@data-qa-id='search-button']";
     static final String SELECT_COLUMNS = "//div[@data-qa-id='select-columns-button']";
-
-//    protected final SeleniumApi selenium;
-//
-//    public FilterPO() {
-//        this.selenium = PlaywrightActions.getInstance();
-//    }
 
     /**
      * Most filters will close automatically after interaction.
@@ -124,71 +118,90 @@ public class FilterPO extends CommonPO {
     /**
      * @return All active filters.
      */
+//    public List<String> getActiveFilters() {
+//        String currentUrl = selenium.getCurrentUrl();
+//        ProviderType type = ProviderType.getProviderTypeFromCurrentUrl(currentUrl);
+//
+//        openFilterMenu();
+//
+//        List<String> activeFilters = new ArrayList<>();
+//
+//        // Get checked filters
+//        activeFilters.addAll(getCheckedFilters(type));
+//
+//        // Device has checkboxes that need fetching
+//        if (type.equals(DEVICE)) {
+//            activeFilters.addAll(getCheckboxedFilters());
+//        }
+//
+//        closeFilterMenu();
+//
+//        return activeFilters;
+//    }
+    // todo: denna returnerar nu alla filter, även header.
+    //
     public List<String> getActiveFilters() {
+        // Get filters
+        List<FilterItem> filterItems = getAllFilters();
+
         String currentUrl = actions().getCurrentUrl();
         ProviderType type = ProviderType.getProviderTypeFromCurrentUrl(currentUrl);
 
-        openFilterMenu();
+        // Remove the header row
+        filterItems.removeFirst();
 
-        List<String> activeFilters = new ArrayList<>();
-
-        // Get checked filters
-        activeFilters.addAll(getCheckedFilters(type));
-
-        // Device has checkboxes that need fetching
         if (type.equals(DEVICE)) {
-            activeFilters.addAll(getCheckboxedFilters());
+            return filterItems.stream()
+                    .filter(filterItem -> filterItem.getCheckbox() != null)
+                    .filter(filterItem -> filterItem.getCheckbox().getStatus().equals(StatusAssesser.Status.CHECKED))
+                    .map(FilterItem::getText)
+                    .toList();
+        } else {
+            return filterItems.stream()
+                    .filter(filterItem -> filterItem.getIcon() != null)
+                    .map(FilterItem::getText)
+                    .toList();
         }
-
-        closeFilterMenu();
-
-        return activeFilters;
     }
 
     /**
      * @return All filters.
      */
-    public List<String> getAllFilters(ProviderType type) {
+    public List<FilterItem> getAllFilters() {
+
         openFilterMenu();
 
-        List<String> filterTexts;
-        if (type.equals(DEVICE)) {
-            filterTexts = actions().findManyElementsTexts(FILTER_LIST_NO_HEADER);
-        } else {
-            filterTexts = actions().findManyElementsTexts(FILTER_LIST);
-        }
+        List<FilterItem> filterItems = getAllMenuFilterItems();
 
         closeFilterMenu();
 
-        return filterTexts.stream()
-                .map(this::removeCounterFromFilterText)
-                .map(this::removeDoneFromFilterText)
-                .collect(Collectors.toList());
+        return filterItems;
     }
+
 
     /**
      * @return All the filters that are checked or checkboxed.
      */
-    private List<String> getCheckedFilters(ProviderType type) {
-        List<String> filterTexts;
-        if (type.equals(DEVICE)) {
-            filterTexts = actions().findManyElementsTexts(FILTER_LIST_NO_HEADER);
-        } else {
-            filterTexts = actions().findManyElementsTexts(FILTER_LIST);
-        }
-        return filterTexts.stream()
-                .filter(filterText -> filterText.contains("done"))  // 'done' = checked filter
-                .map(this::removeCounterFromFilterText)
-                .map(this::removeDoneFromFilterText)
-                .collect(Collectors.toList());
-    }
+//    private List<String> getCheckedFilters(ProviderType type) {
+//        List<String> filterTexts;
+//        if (type.equals(DEVICE)) {
+//            filterTexts = actions().findManyElementsTexts(FILTER_LIST_NO_HEADER);
+//        } else {
+//            filterTexts = actions().findManyElementsTexts(FILTER_LIST);
+//        }
+//        return filterTexts.stream()
+//                .filter(filterText -> filterText.contains("done"))  // 'done' = checked filter
+//                .map(this::removeCounterFromFilterText)
+//                .map(this::removeDoneFromFilterText)
+//                .collect(Collectors.toList());
+//    }
 
     /**
      * @return checkboxed filters (device only)
      */
-    private List<String> getCheckboxedFilters() {
-        return actions().findCheckboxedFilterText(FILTER_TICKED_CHECKBOXES);
-    }
+//    private List<String> getCheckboxedFilters() {
+//        return actions().findCheckboxedFilterText(FILTER_TICKED_CHECKBOXES);
+//    }
 
     /**
      * @return The number of active filters in Device.filterButton

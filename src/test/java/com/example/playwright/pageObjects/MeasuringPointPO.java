@@ -86,7 +86,7 @@ public class MeasuringPointPO extends CommonPO {
         actions().clearAndType(MP_NAME, Randomizer.randomString(10));
 
         // Now tab to device list field
-        actions().simulateKey(MP_NAME, TAB);
+        actions().simulateKey(MP_NAME, "Tab");
 
         //enter any digit so device list pops up
         actions().clearAndType(MP_DEVICE, String.valueOf(Randomizer.randomInt(1,5)));

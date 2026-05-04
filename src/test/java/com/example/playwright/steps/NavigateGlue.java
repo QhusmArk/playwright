@@ -40,27 +40,27 @@ public class NavigateGlue extends BaseGlue {
     @And("I am at project {string}")
     @When("I navigate to project {string}")
     public void iNavigateToProject(String endpoint) {
-        int projectId = context.getProject().getId();
+        int projectId = context().getProject().getId();
         switch (endpoint) {
-            case "overview" -> Navigate.project(context.getProject().getId()).overview().get();
-            case "measuring points" -> Navigate.project(context.getProject().getId()).measurePoints().get();
-            case "measuring point create" -> Navigate.project(context.getProject().getId()).measurePoints().create().get();
-            case "blasts" -> Navigate.project(context.getProject().getId()).blasts().get();
-            case "devices" -> Navigate.project(context.getProject().getId()).devices().get();
-            case "settings" -> Navigate.project(context.getProject().getId()).settings().get();
-            case "settings general" -> Navigate.project(context.getProject().getId()).settings().general().get();
-            case "data reports" -> Navigate.project(context.getProject().getId()).views().get();
-            case "data reports create" -> Navigate.project(context.getProject().getId()).views().create().get();
+            case "overview" -> Navigate.project(context().getProject().getId()).overview().get();
+            case "measuring points" -> Navigate.project(context().getProject().getId()).measurePoints().get();
+            case "measuring point create" -> Navigate.project(context().getProject().getId()).measurePoints().create().get();
+            case "blasts" -> Navigate.project(context().getProject().getId()).blasts().get();
+            case "devices" -> Navigate.project(context().getProject().getId()).devices().get();
+            case "settings" -> Navigate.project(context().getProject().getId()).settings().get();
+            case "settings general" -> Navigate.project(context().getProject().getId()).settings().general().get();
+            case "data reports" -> Navigate.project(context().getProject().getId()).views().get();
+            case "data reports create" -> Navigate.project(context().getProject().getId()).views().create().get();
             case "scheduled_reports" -> Navigate.project(projectId).scheduledReports().get();
             case "scheduled_reports create" -> Navigate.project(projectId).scheduledReports().create().get();
-            case "message rules" -> Navigate.project(context.getProject().getId()).messageRules().get();
-            case "users" -> Navigate.project(context.getProject().getId()).users().get();
-            case "users create" -> Navigate.project(context.getProject().getId()).users().create().get();
-            case "users manage" -> Navigate.project(context.getProject().getId()).users().manage().get();
-            case "billing report create" -> Navigate.project(context.getProject().getId()).billingReports().create().get();
+            case "message rules" -> Navigate.project(context().getProject().getId()).messageRules().get();
+            case "users" -> Navigate.project(context().getProject().getId()).users().get();
+            case "users create" -> Navigate.project(context().getProject().getId()).users().create().get();
+            case "users manage" -> Navigate.project(context().getProject().getId()).users().manage().get();
+            case "billing report create" -> Navigate.project(context().getProject().getId()).billingReports().create().get();
             case "agendas", "settings agendas" -> {
-                Navigate.project(context.getProject().getId()).overview().get(); // We need to go here first so that the gui loads all projects, which web client needs for agendas
-                Navigate.project(context.getProject().getId()).settings().agendas().get();
+                Navigate.project(context().getProject().getId()).overview().get(); // We need to go here first so that the gui loads all projects, which web client needs for agendas
+                Navigate.project(context().getProject().getId()).settings().agendas().get();
             }
             default -> throw new IllegalStateException("Unexpected endpoint value: " + endpoint);
         }

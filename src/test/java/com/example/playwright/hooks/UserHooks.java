@@ -17,7 +17,7 @@ public class UserHooks extends BaseGlue {
 
     @Before(order = 1)
     public void acquireUserWithRole(Scenario scenario) {
-        ScenarioContext.setScenarioName(scenario.getName());
+        Scenariocontext().setScenarioName(scenario.getName());
 
         String requiredRole = resolveRequiredRole(scenario);
 
@@ -63,7 +63,7 @@ public class UserHooks extends BaseGlue {
     @After(order = 100)
     public void clearScenarioContext() {
         deleteProject();
-        ScenarioContext.clear();
+        Scenariocontext().clear();
         TestContextHolder.clear();
     }
 
@@ -79,7 +79,7 @@ public class UserHooks extends BaseGlue {
         Project project = context().getProject();
 
         if (project == null) {
-            System.out.println("No project in context. No deleting to be done.");
+            System.out.println("No project in context(). No deleting to be done.");
         } else {
             int projectId = project.getId();
             System.out.println("Deleting test project " + projectId + ".");

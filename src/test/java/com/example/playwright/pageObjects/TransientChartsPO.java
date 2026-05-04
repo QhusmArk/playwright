@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import static com.example.playwright.helpers.enums.IconType.EXPANDED;
-import static com.example.playwright.helpers.enums.IconType.TRANSIENT;
+import static com.example.playwright.helpers.enums.ReportType.TRANSIENT;
 
 public class TransientChartsPO extends CommonPO {
+
+    DataReportPO dataReportPO = new DataReportPO();
 
     // Transient report consist of TDA and sometimes FDA
     public TransientAnalysisReport getTransientView() {
@@ -21,7 +23,7 @@ public class TransientChartsPO extends CommonPO {
         PanelHeader panelHeader = getPanelHeader("report");
         tcv.setPanelHeader(panelHeader);
 
-        String reportDuration = getDrPO().getReportDuration(TRANSIENT);
+        String reportDuration = dataReportPO.getReportDuration(TRANSIENT);
         tcv.setTransientTime(reportDuration);
 
         // TDA is always in a transient view

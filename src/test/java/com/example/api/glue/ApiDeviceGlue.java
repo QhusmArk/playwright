@@ -22,10 +22,9 @@ import io.restassured.response.Response;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static com.example.playwright.enums.DeviceType.C22;
+import static com.example.playwright.helpers.enums.DeviceType.C22;
 import static java.util.Arrays.copyOfRange;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ApiDeviceGlue extends BaseGlue {
 
@@ -62,7 +61,7 @@ public class ApiDeviceGlue extends BaseGlue {
     //todo: till typ ApiJsonGlue?
     @Then("device response contains only one of each key")
     public void onlyOneOfEachKey() {
-        List<Device> expectedCreatorLoggers = context.getDevicesAsList();
+        List<Device> expectedCreatorLoggers = context().getDevicesAsList();
 
         // Nb. This fails for C50's
         expectedCreatorLoggers.forEach(device -> {
@@ -79,7 +78,7 @@ public class ApiDeviceGlue extends BaseGlue {
     @Then("device response contains only one of these keys")
     public void deviceResponseContainsOnlyOneOfTheseKeys(DataTable table) {
         List<String> expectedKeys = table.row(0);
-        List<Device> expectedCreatorLoggers = context.getDevicesAsList();
+        List<Device> expectedCreatorLoggers = context().getDevicesAsList();
 
         // Nb. This fails for C50's
         expectedCreatorLoggers.forEach(device -> {
@@ -97,7 +96,7 @@ public class ApiDeviceGlue extends BaseGlue {
     //todo: till typ ApiJsonGlue?
     @And("this keys is of this type")
     public void thisKeysIsOfThisType(Map<String, String> keyTypePairs) {
-        List<Device> expectedCreatorLoggers = context.getDevicesAsList();
+        List<Device> expectedCreatorLoggers = context().getDevicesAsList();
 
         expectedCreatorLoggers.forEach(device -> {
             Response deviceResponse = DeviceApi.getDeviceResponse(device.getType(), device.getSerial());

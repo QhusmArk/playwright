@@ -1,11 +1,17 @@
 package com.example.playwright.steps;
 
+import com.example.playwright.components.panels.project.ProjectSettingsAgendasPanel;
+import io.cucumber.datatable.DataTable;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CommonGlue extends BaseGlue{
 
@@ -20,7 +26,7 @@ public class CommonGlue extends BaseGlue{
         }
 
         // Try go get all messages coming up from bottom of GUI
-        List<String> actualTexts = cePO.getToasts();
+        List<String> actualTexts = menuPO.getToasts();
 
         // Translation logic for Swedish and French
         String expectedTextInSwedish = translateToSwedish(expectedTextInEnglish);
@@ -88,6 +94,46 @@ public class CommonGlue extends BaseGlue{
         };
     }
 
+    // Validation message is below field, and is red
+    @Then("{string} has validation message {string}")
+    public void fieldHasValidationMessage(String field, String expectedValidationMessage) {
+        String actualValidationMessage = menuPO.getValidationMessageText(field);
+        System.out.println("expectedValidationMessage/actualValidationMessage" + expectedValidationMessage + "/" + actualValidationMessage);
+        assertEquals(expectedValidationMessage, actualValidationMessage);
+    }
 
+    @Then("notify message {string} is displayed")
+    public void iGetPanelNotify(String expectedNotifyMessage) {
+        assertTrue(menuPO.checkForNotifyContaining(expectedNotifyMessage));
+    }
+
+    @Then("no toast is displayed")
+    public void noToastIsDisplayed() {
+        List<String> actualTexts = menuPO.getToasts();
+        assertTrue(actualTexts.isEmpty());
+    }
+
+    @And("click on aside {string}")
+    public void clickOnAsideProjectSettings(String textOnListItem) {
+        menuPO.clickAsideListItem(textOnListItem);
+    }
+
+    @And("click on panel {string}")
+    public void clickOnPanelAgendas(String panelSelectionText) {
+        menuPO.clickPanelSelection(panelSelectionText);
+    }
+
+    @When("I click on {string} button")
+    public void iClickOnButton(String buttonToClick) {
+        menuPO.clickButton(buttonToClick);
+    }
+
+    @Then("these buttons are not present")
+    public void theseButtonsAreNotPresent(DataTable table) {
+        ProjectSettingsAgendasPanel panel = agendaPO.getAgendasPanel();
+
+        assertNull(panel.getCopyAgendaButton());
+        assertNull(panel.getCreateAgendaButton());
+    }
 
 }

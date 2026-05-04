@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.helpers.StatusAssesser.Status.ACTIVE;
+import static com.example.playwright.helpers.enums.IconType.EXPANDED;
 
 public class ScheduleReportsPO extends CommonPO {
 

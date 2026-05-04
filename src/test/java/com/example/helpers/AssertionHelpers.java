@@ -1,5 +1,4 @@
-package com.example.api.helpers;
-
+package com.example.helpers;
 
 import com.example.playwright.helpers.PlaywrightActions;
 

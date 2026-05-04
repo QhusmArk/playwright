@@ -6,8 +6,8 @@ import com.example.api.models.measuringpoint.MeasuringPoint;
 import com.example.api.models.measuringpoint.Sensor;
 import com.example.api.models.project.Project;
 import com.example.api.models.user.User;
-import com.example.playwright.enums.ColourSchema;
-import com.example.playwright.enums.ProviderType;
+import com.example.playwright.helpers.enums.ColourSchema;
+import com.example.playwright.helpers.enums.ProviderType;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

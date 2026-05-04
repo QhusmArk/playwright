@@ -48,8 +48,6 @@ public class IconPO extends CommonPO {
         IconContext context = buildIconContext(parentPath, tagName);
         IconScenario scenario = determineScenario(context);
 
-//        System.out.println("Scenario: " + scenario);
-
         return buildIconForScenario(context, scenario);
     }
 

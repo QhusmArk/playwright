@@ -265,7 +265,7 @@ public class Context {
 
     public void storeMeasuringPointDevice(final MeasuringPoint measuringPoint) {
         if (measuringPoints != null) {
-            //To ease access to devices used in Mp's, add them to Context.
+            //To ease access to devices used in Mp's, add them to context().
             List<String> mpSensorsSerial = measuringPoint.getSensors().stream()             // for each mp
                     .map(Sensor::getSerial)                                     // get the sensor serial
                     .toList();
@@ -298,7 +298,7 @@ public class Context {
      */
     public void storeMeasuringPointDevices() {
         if (measuringPoints != null) {
-            //To ease access to devices used in Mp's, add them to Context.
+            //To ease access to devices used in Mp's, add them to context().
             List<String> mpSensorsSerial = measuringPoints.stream()             // for each mp
                     .flatMap(mp -> mp.getSensors().stream())      // for each sensor in the mp
                     .map(Sensor::getSerial)                                     // get the sensor serial

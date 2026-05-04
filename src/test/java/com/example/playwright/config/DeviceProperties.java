@@ -1,6 +1,7 @@
 package com.example.playwright.config;
 
-import com.example.playwright.enums.DeviceType;
+
+import com.example.playwright.helpers.enums.DeviceType;
 
 import java.io.InputStream;
 import java.util.HashMap;

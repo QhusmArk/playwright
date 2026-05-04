@@ -30,12 +30,6 @@ public class UserPO extends CommonPO {
     private static final String DROPDOWN_LANGUAGE = "//*[@data-qa-id='language']";
     private static final String BUTTON_SAVE = "//button[@type='submit']";
 
-//    protected final SeleniumApi selenium;
-//
-//    public UserPO() {
-//        this.selenium = PlaywrightActions.getInstance();
-//    }
-
     //settings
     public String getSettingsCurrentLanguage() {
         return actions().findOneElementsText(DROPDOWN_LANGUAGE);

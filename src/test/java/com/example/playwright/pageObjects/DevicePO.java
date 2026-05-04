@@ -313,7 +313,7 @@ public class DevicePO extends CommonPO {
         actions().makeClick(standardDropDownPath);
     }
 
-    public void inputTriggerValueAndPressKey(String deviceType, String value, Keys key) {
+    public void inputTriggerValueAndPressKey(String deviceType, String value, String key) {
         String triggerValuePath = switch (DeviceType.fromType(deviceType)) {
             case C22, C20, POINT, C50 -> "(//*[@data-qa-id[contains(., '_trigger_value')]])[1]";
             default -> throw new IllegalStateException("Unexpected deviceType: " + deviceType);

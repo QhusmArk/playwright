@@ -19,7 +19,7 @@
         <restassured.version>5.1.0</restassured.version>
 
         <jcraft.version>0.1.55</jcraft.version>
-
+        <twilio.version>10.6.6</twilio.version>
     </properties>
 
     <dependencies>
@@ -103,6 +103,12 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>${jcraft.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio</artifactId>
+            <version>${twilio.version}</version>
         </dependency>
 
     </dependencies>

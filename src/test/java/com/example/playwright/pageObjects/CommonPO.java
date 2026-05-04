@@ -176,7 +176,6 @@ public abstract class CommonPO {
 
     public ColourSchema getElementColourByCss(String elementPath) {
         String cssValue = actions().findOneElementsCssValue(elementPath, "color");
-        System.out.println("cssValue: " + cssValue);
         return ColourSchema.fromCssValue(cssValue);
     }
 
@@ -327,20 +326,6 @@ public abstract class CommonPO {
      */
     public void setToggle(String expectedToggleText, boolean save) {
         actions().makeClick("//div[@role='switch' and @aria-label='"+expectedToggleText+"']");
-        if (save) {
-            actions().makeClick("//button[@type='submit']");
-        }
-    }
-
-    // Did not work due to new value to input element do not 'stick' as it's replaced with original value.
-    public void setTimeInterval(String timeInterval, String value, boolean save) {
-
-        // Try to edit to-date. Not in DOM...
-        actions().clearAndTypeValueForElementNotInDOM("//form //label[@data-qa-id='"+timeInterval+"'] //input", value);
-
-        // Click on Off-toggle so we do not force inactive-status
-        setToggle("Off", false);
-
         if (save) {
             actions().makeClick("//button[@type='submit']");
         }
@@ -2373,6 +2358,47 @@ public abstract class CommonPO {
     public void clickOnItem(String itemPath) {
         actions().makeClick(itemPath);
     }
+
+    public List<FilterItem> getAllMenuFilterItems() {
+        List<FilterItem> filterItems = new ArrayList<>();
+
+        String filtersPath = "//div[@role='menu'] //div[@role='listitem']";
+
+        int filterRows =  actions().countHowManyElements(filtersPath);
+
+        for (int row = 1; row <= filterRows; row++) {
+            String filterRowPath = "(" + "//div[@role='listitem'])[" + row + "]";
+            
+            FilterItem filter = getFilterItem(filterRowPath);
+            filterItems.add(filter);
+        }
+        
+        return filterItems;
+    }
+
+    private FilterItem getFilterItem(String filterRowPath) {
+        FilterItem filter = new FilterItem();
+
+        // Null, icon or checkbox
+        boolean hasIcon = actions().elementExistAndVisible(filterRowPath + "//i", false, 0);
+        if (hasIcon) {
+            Icon icon = getIcon(filterRowPath + "//i");
+            filter.setIcon(icon);
+        }
+
+        boolean hasCheckbox = actions().elementExistAndVisible(filterRowPath + "//div[@role='checkbox']", false, 0);
+        if (hasCheckbox) {
+            Checkbox checkbox = getCheckbox(filterRowPath + "//div[@role='checkbox']");
+            filter.setCheckbox(checkbox);
+        }
+
+        // Text
+        String text = actions().findOneElementsText(filterRowPath);
+        filter.setText(text);
+
+        return filter;
+    }
+
 
     public Listbox getListbox() {
         Listbox listbox = new Listbox();

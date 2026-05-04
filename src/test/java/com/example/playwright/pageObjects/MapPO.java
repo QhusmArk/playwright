@@ -5,8 +5,8 @@ import com.example.helpers.StatusAssesser.Status;
 import com.example.playwright.components.map.MainPane;
 import com.example.playwright.components.parts.LocationFloatingPanel;
 import com.example.playwright.helpers.PlaywrightActions;
+import com.microsoft.playwright.options.BoundingBox;
 
-import java.awt.*;
 import java.util.List;
 
 import static com.example.helpers.StatusAssesser.Status.*;
@@ -22,12 +22,6 @@ public class MapPO extends CommonPO {
 
     private static final String ZOOM_IN = "//main //div[@class='leaflet-control-container'] //a[@title='Zoom in']";
     private static final String ZOOM_OUT = "//main //div[@class='leaflet-control-container'] //a[@title='Zoom out']";
-
-//    protected final SeleniumApi selenium;
-//
-//    public MapPO() {
-//        this.selenium = PlaywrightActions.getInstance();
-//    }
 
     public void changeZoom(String direction) {
         switch (direction) {
@@ -110,7 +104,7 @@ public class MapPO extends CommonPO {
         return actions().elementExistAndVisible("//img[@title='"+labelText+"']");
     }
 
-    public Point getLocationOfLargeIcon(String icon) {
+    public BoundingBox getLocationOfLargeIcon(String icon) {
         String iconType = switch (icon) {
             case "large project" -> "project/map-marker-project-hover";
             case "large mp" -> "mp/map-marker-mp-group";
@@ -125,7 +119,7 @@ public class MapPO extends CommonPO {
         return actions().readElementPosition("//div[@class='leaflet-pane leaflet-popup-pane'] //img[@src='svg/"+iconType+".svg']");
     }
 
-    public Point getLocationOfMapIcon(String labelText) {
+    public BoundingBox getLocationOfMapIcon(String labelText) {
         if (!actions().elementExistAndVisible("//img[@title='"+labelText+"']", true, 1)) {
            throw new IllegalArgumentException("Cannot find mp map marker: " + labelText);
         }

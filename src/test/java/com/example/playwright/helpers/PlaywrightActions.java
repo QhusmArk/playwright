@@ -6,12 +6,15 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.TimeoutError;
+import com.microsoft.playwright.options.BoundingBox;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 public class PlaywrightActions {
 
@@ -122,6 +125,11 @@ public class PlaywrightActions {
         return locator.getAttribute(attributeName);
     }
 
+    public boolean elementHasAttribute(String path, String attributeName) {
+        String attribute = findOneElementsAttribute(path, attributeName);
+        return (attribute != null); // todo: kommer vi hit, eller har ovan metodanrop redan kastat motsv nosuchelementexception?
+    }
+
     // todo: missvisande namn.
     /*
     Bygga in en if-sats i findOneElementsAttribute som säger typ
@@ -129,11 +137,18 @@ public class PlaywrightActions {
     hämta då med JavaScript
      */
     public String findOneElementsValueAttribute(String path) {
-//        System.out.print("\nTrying to find element " + path + " not in DOM and get the text.\n");
-//        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-//        WebElement webElement = findOneElement(path, 0);
-//        return (String) jsExecutor.executeScript("return arguments[0].value;", webElement);
         return findOneElementsAttribute(path, "value");
+    }
+
+    // todo: missvisande namn?
+    public List<String> findManyElementsAttribute(String path, String attributeName) {
+        Locator elements = page.locator(path);
+
+        return elements.all()
+                .stream()
+                .map(element -> element.getAttribute(attributeName))
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public final boolean elementExistAndVisible(final String path) {
@@ -157,22 +172,6 @@ public class PlaywrightActions {
         return page.locator(path).allTextContents();
     }
 
-    public final void makeClickOnAllElements(String path) {
-        Locator elements = getLocator(path);
-        int count = elements.count();
-        makeClickOnSomeElements(path, count);
-    }
-
-    public void makeClickOnSomeElements(String path, int elementsToClick) {
-        Locator elements = getLocator(path);
-        int count = elements.count();
-        System.out.println("count: " + count);
-
-        for(int i = 0; i < elementsToClick; i++) {
-            elements.nth(i).click();
-        }
-    }
-
     public int countHowManyElements(String path) {
         Locator elements = getLocator(path);
         return elements.count();
@@ -182,6 +181,81 @@ public class PlaywrightActions {
         System.out.println("\nTrying to count how many visible elements from'" + path + "'");
         return countHowManyElements(path);
     }
+
+    public String findOneElementsCssValue(String elementPath, String color) {
+        System.out.println("\nTrying to find css value of attribute '" + color + "' in '" + elementPath + "'");
+
+        Locator element = getLocator(elementPath);
+        Object result = element.evaluate(" (el, prop) => getComputedStyle(el)[prop] ", color);
+
+        return (result != null)
+                ? result.toString()
+                : null;
+    }
+
+    public final void makeClickOnAllElements(String path) {
+        makeClickOnSelectedElements(path);
+    }
+
+    public final void makeClickOnSomeElements(String path, int elementsToClick) {
+        makeClickOnSelectedElements(path, elementsToClick);
+    }
+
+    private void makeClickOnSelectedElements(String path) {
+        Locator elements = getLocator(path);
+        int count = elements.count();
+
+        makeClickOnSelectedElements(path, count);
+    }
+
+    private void makeClickOnSelectedElements(String path, int elementsToClick) {
+        List<Integer> clickElements = IntStream.rangeClosed(1, elementsToClick)
+                .boxed()
+                .toList();
+
+        makeClickOnSelectedElements(path, clickElements);
+    }
+
+    private void makeClickOnSelectedElements(String path, List<Integer> elementsToClick) {
+        Locator elements = getLocator(path);
+
+        int count = elements.count();
+
+        for (Integer index : elementsToClick) {
+            if (index < count) {
+                elements.nth(index).click();
+            }
+        }
+    }
+
+    public void hoverAboveElement(String path) {
+        Locator element = getLocator(path);
+        element.hover();
+
+    }
+
+    public void simulateKey(String path, String key) {
+        String keyToUse = switch (key.toLowerCase()) {
+            case "tab" -> "Tab";
+            case "escape" -> "Escape";
+            case "arrowdown" -> "ArrowDown";
+            case "backspace" -> "Backspace";
+            default -> throw new IllegalArgumentException(key);
+        };
+        Locator element = getLocator(path);
+        element.press(keyToUse);
+    }
+
+    public String getComputedStyle(String elementPath, String property) {
+        Locator element = page.locator(elementPath);
+        return (String) element.evaluate(
+                "(el, prop) => window.getComputedStyle(el).getPropertyValue(prop)",
+                property
+        );
+    }
+
+
+    //  ************************* Processors *********************************
 
     /**
      * @return True if element is not present, or present but not visible.
@@ -209,8 +283,6 @@ public class PlaywrightActions {
             );
         }
     }
-
-    //  ************************* Processors *********************************
 
     private Locator getLocator(String path) {
        return getLocator(path, 0);
@@ -283,11 +355,12 @@ public class PlaywrightActions {
      */
     public String getTagName(String path) {
         Object result = getLocator(path).evaluate("el => el.tagName.toLowerCase()");
-        return result != null ? result.toString() : null;
+        return (result != null)
+                ? result.toString()
+                : null;
     }
 
 //  ************************** Helpers *******************************
-
 
     public void validateXpathLastElement(String expectedLastElement, String pathToValidate) {
         validateXpathLastElements(List.of(expectedLastElement), pathToValidate);
@@ -348,20 +421,14 @@ public class PlaywrightActions {
     public void makeJavaScriptClick(String selector) {
         System.out.println(" -> Retry with JavaScript click.");
 
-        page.evaluate(
-                "selector => document.querySelector(selector)?.click()",
-                selector
-        );
+        page.evaluate("selector => document.querySelector(selector)?.click()", selector);
     }
 
     /**
      * Sets a localStorage item.
      */
     public void setLocalStorageItem(String key, Object value) {
-        page.evaluate(
-                "([key, value]) => window.localStorage.setItem(key, value)",
-                List.of(key, value)
-        );
+        page.evaluate("([key, value]) => window.localStorage.setItem(key, value)", List.of(key, value));
     }
 
 
@@ -409,5 +476,29 @@ public class PlaywrightActions {
         return page.url();
     }
 
+    public void hoverAboveElementAndClickOnTheNoMoreHiddenElement(String hoverAbovePath, String clickOnThisPath) {
+        System.out.printf(
+                "%nTrying to hover above element '%s' and to click on '%s'%n",
+                hoverAbovePath,
+                clickOnThisPath
+        );
+
+        Locator hoverElement = getLocator(hoverAbovePath);
+        Locator elementToClick = getLocator(clickOnThisPath);
+
+        hoverElement.hover();
+        elementToClick.click();
+    }
+
+    public BoundingBox readElementPosition(String path) {
+        Locator element = getLocator(path);
+        return element.boundingBox();
+    }
+
+    // Click at absolute viewport coordinates (x, y)
+    public void clickAtCoordinates(Page page, int x, int y) {
+        System.out.println("\nTrying to click at screen coordinates: (" + x + ", " + y + ")");
+        page.mouse().click(x, y);
+    }
 
 }

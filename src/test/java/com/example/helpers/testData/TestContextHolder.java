@@ -9,11 +9,11 @@ public final class TestContextHolder {
 
     /** Returns the context for the current scenario thread. */
     public static Context getContext() {
-        return CONTEXT.get();
+        return context().get();
     }
 
     /** Clears the context after the scenario to avoid leaking data between tests. */
     public static void clear() {
-        CONTEXT.remove();
+        context().remove();
     }
 }

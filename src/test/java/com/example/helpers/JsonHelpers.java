@@ -1,4 +1,4 @@
-package com.example.api.helpers;
+package com.example.helpers;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;

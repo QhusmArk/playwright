@@ -56,10 +56,14 @@ public class LoginHooks extends BaseGlue {
         loginCurrentUser();
 
         Cookie sessionid = BrowserHooks.getCookie("sessionid");
-        SessionCookieManager.saveSessionCookie(
-                currentUser,
-                sessionid
-        );
+        if (sessionid != null) {
+            SessionCookieManager.saveSessionCookie(
+                    currentUser,
+                    sessionid
+            );
+        } else {
+            throw new RuntimeException("sessionid could not be found.");
+        }
     }
 
     private boolean hasExpired(Cookie cookie) {

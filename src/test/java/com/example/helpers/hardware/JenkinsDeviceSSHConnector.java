@@ -4,7 +4,7 @@ import com.example.api.endpoints.DeviceApi;
 import com.example.playwright.config.DeviceProperties;
 import com.example.playwright.config.FirmwareProperties;
 import com.example.playwright.config.JenkinsProperties;
-import com.example.playwright.enums.DeviceType;
+import com.example.playwright.helpers.enums.DeviceType;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;

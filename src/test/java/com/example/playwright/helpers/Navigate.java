@@ -1,8 +1,8 @@
 package com.example.playwright.helpers;
 
 import com.example.playwright.config.TestEnvironment;
-import com.example.playwright.enums.DeviceType;
-import com.example.playwright.enums.ProviderType;
+import com.example.playwright.helpers.enums.DeviceType;
+import com.example.playwright.helpers.enums.ProviderType;
 import com.example.playwright.hooks.BrowserHooks;
 import com.microsoft.playwright.TimeoutError;
 
@@ -475,6 +475,11 @@ public class Navigate {
         BrowserHooks.getPage().waitForURL(url -> url.contains(value));
     }
 
+    public static ProviderType getProviderTypeFromUrl() {
+        String currentUrl = getCurrentUrl();
+        return ProviderType.getProviderTypeFromCurrentUrl(currentUrl);
+    }
+
     public static void validateUrlContains(String value) {
         try {
             BrowserHooks.getPage().waitForURL(url -> url.contains(value));
@@ -486,4 +491,8 @@ public class Navigate {
     public static void refreshBrowser() {
         BrowserHooks.getPage().reload();
     }
+
+
+
+
 }
