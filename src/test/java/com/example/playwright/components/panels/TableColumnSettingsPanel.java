@@ -1,10 +1,10 @@
 package com.example.playwright.components.panels;
 
+import com.example.helpers.StatusAssesser;
 import com.example.playwright.components.parts.Button;
 import com.example.playwright.components.parts.Checkbox;
 import com.example.playwright.components.parts.panelParts.PanelHeader;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sigicom.helpers.assessers.StatusAssesser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

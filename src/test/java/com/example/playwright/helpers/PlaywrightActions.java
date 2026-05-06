@@ -89,25 +89,25 @@ public class PlaywrightActions {
      */
     public void makeClick(String path) {
         System.out.print("\nTrying to click on " + path + "\n");
-        Locator locator = getLocator(path);
+        Locator locator = getFirstLocator(path);
         locator.click();
     }
 
     // Not tested
     public final void appendText(String path, String inputValue) {
         System.out.println("\nTrying to find input field '" + path + "' and add '" + inputValue + "'");
-        Locator locator = getLocator(path);
+        Locator locator = getFirstLocator(path);
         locator.pressSequentially(inputValue);
     }
 
     public final void clearAndType(String path, String inputValue) {
         System.out.println("\nTrying to clear input field '" + path + "' and type '" + inputValue + "'");
-        Locator locator = getLocator(path);
+        Locator locator = getFirstLocator(path);
         locator.fill(inputValue);
     }
 
     public String findOneElementsText(String path, int timeToWait) {
-        Locator locator = getLocator(path);
+        Locator locator = getFirstLocator(path);
         return locator.textContent();
     }
 
@@ -115,14 +115,18 @@ public class PlaywrightActions {
      * Returns text content of a locator.
      */
     public String findOneElementsText(String path) {
-        Locator locator = getLocator(path);
+        Locator locator = getFirstLocator(path);
         return locator.textContent();
     }
 
     public String findOneElementsAttribute(final String path, String attributeName) {
         System.out.println("\nTrying to find value of attribute '" + attributeName + "' in '" + path + "'");
-        Locator locator = getLocator(path);
-        return locator.getAttribute(attributeName);
+        Locator locator = getFirstLocator(path);
+        String attributeValue = locator.getAttribute(attributeName);
+        if (attributeValue == null) {
+            throw new IllegalStateException("Could not find attribute '" + attributeName + "' in '" + path + "'");
+        }
+        return attributeValue;
     }
 
     public boolean elementHasAttribute(String path, String attributeName) {
@@ -142,7 +146,7 @@ public class PlaywrightActions {
 
     // todo: missvisande namn?
     public List<String> findManyElementsAttribute(String path, String attributeName) {
-        Locator elements = page.locator(path);
+        Locator elements = page.locator(path).first();
 
         return elements.all()
                 .stream()
@@ -172,20 +176,20 @@ public class PlaywrightActions {
         return page.locator(path).allTextContents();
     }
 
-    public int countHowManyElements(String path) {
-        Locator elements = getLocator(path);
-        return elements.count();
-    }
-
     public int countHowManyVisibleElements(String path) {
         System.out.println("\nTrying to count how many visible elements from'" + path + "'");
         return countHowManyElements(path);
     }
 
+    public int countHowManyElements(String path) {
+        Locator elements = page.locator(path);
+        return elements.count();
+    }
+
     public String findOneElementsCssValue(String elementPath, String color) {
         System.out.println("\nTrying to find css value of attribute '" + color + "' in '" + elementPath + "'");
 
-        Locator element = getLocator(elementPath);
+        Locator element = getFirstLocator(elementPath);
         Object result = element.evaluate(" (el, prop) => getComputedStyle(el)[prop] ", color);
 
         return (result != null)
@@ -202,7 +206,7 @@ public class PlaywrightActions {
     }
 
     private void makeClickOnSelectedElements(String path) {
-        Locator elements = getLocator(path);
+        Locator elements = page.locator(path);
         int count = elements.count();
 
         makeClickOnSelectedElements(path, count);
@@ -217,7 +221,7 @@ public class PlaywrightActions {
     }
 
     private void makeClickOnSelectedElements(String path, List<Integer> elementsToClick) {
-        Locator elements = getLocator(path);
+        Locator elements = page.locator(path);
 
         int count = elements.count();
 
@@ -229,9 +233,8 @@ public class PlaywrightActions {
     }
 
     public void hoverAboveElement(String path) {
-        Locator element = getLocator(path);
+        Locator element = getFirstLocator(path);
         element.hover();
-
     }
 
     public void simulateKey(String path, String key) {
@@ -242,18 +245,17 @@ public class PlaywrightActions {
             case "backspace" -> "Backspace";
             default -> throw new IllegalArgumentException(key);
         };
-        Locator element = getLocator(path);
+        Locator element = getFirstLocator(path);
         element.press(keyToUse);
     }
 
     public String getComputedStyle(String elementPath, String property) {
-        Locator element = page.locator(elementPath);
+        Locator element = page.locator(elementPath).first();
         return (String) element.evaluate(
                 "(el, prop) => window.getComputedStyle(el).getPropertyValue(prop)",
                 property
         );
     }
-
 
     //  ************************* Processors *********************************
 
@@ -266,7 +268,7 @@ public class PlaywrightActions {
         Instant startTime = Instant.now();
 
         try {
-            boolean hidden = page.locator("xpath=" + xpath).isHidden(
+            boolean hidden = page.locator("xpath=" + xpath).first().isHidden(
                     new Locator.IsHiddenOptions()
                             .setTimeout(timeToWait * 1000)
             );
@@ -284,9 +286,20 @@ public class PlaywrightActions {
         }
     }
 
-    private Locator getLocator(String path) {
-       return getLocator(path, 0);
+    private Locator getFirstLocator(String path) {
+       return getFirstLocator(path, 0);
     }
+
+    /*
+    Första
+    Alla
+    Incremental (1, 2, 3...)
+    Vissa (1, 3, 7)
+     */
+
+//    private Locator getLocator(String path) {
+//
+//    }
 
     /**
      * Automatically waits until the element is:
@@ -294,10 +307,11 @@ public class PlaywrightActions {
      * visible
      * stable (not moving)
      * enabled
-     * receiving events
+     * receiving events.
+     * NB. The method only returns the first element, so this method cannot be used to get many elements.
      */
-    private Locator getLocator(String path, int timeoutSeconds) {
-        Locator locator = page.locator(path);
+    private Locator getFirstLocator(String path, int timeoutSeconds) {
+        Locator locator = page.locator(path).first();
 
         int waitTimeMillis = (timeoutSeconds == 0)
                 ? 100
@@ -314,8 +328,11 @@ public class PlaywrightActions {
         }
     }
 
+
+
+
     private boolean processElementExistAndVisible(String path, boolean failTestIfNotFound, int waitTimeMillis) {
-        Locator locator = page.locator(path);
+        Locator locator = page.locator(path).first();
 
         try {
             locator.waitFor(new Locator.WaitForOptions()
@@ -354,7 +371,7 @@ public class PlaywrightActions {
      * Returns the tag name of the element (lowercase).
      */
     public String getTagName(String path) {
-        Object result = getLocator(path).evaluate("el => el.tagName.toLowerCase()");
+        Object result = getFirstLocator(path).first().evaluate("el => el.tagName.toLowerCase()");
         return (result != null)
                 ? result.toString()
                 : null;
@@ -418,10 +435,10 @@ public class PlaywrightActions {
     /**
      * Clicks an element using JavaScript.
      */
-    public void makeJavaScriptClick(String selector) {
+    public void makeJavaScriptClick(String path) {
         System.out.println(" -> Retry with JavaScript click.");
 
-        page.evaluate("selector => document.querySelector(selector)?.click()", selector);
+        page.evaluate("selector => document.querySelector(path)?.click()", path);
     }
 
     /**
@@ -483,22 +500,100 @@ public class PlaywrightActions {
                 clickOnThisPath
         );
 
-        Locator hoverElement = getLocator(hoverAbovePath);
-        Locator elementToClick = getLocator(clickOnThisPath);
+        Locator hoverElement = getFirstLocator(hoverAbovePath);
+        Locator elementToClick = getFirstLocator(clickOnThisPath);
 
         hoverElement.hover();
         elementToClick.click();
     }
 
     public BoundingBox readElementPosition(String path) {
-        Locator element = getLocator(path);
+        Locator element = getFirstLocator(path);
         return element.boundingBox();
     }
 
     // Click at absolute viewport coordinates (x, y)
-    public void clickAtCoordinates(Page page, int x, int y) {
+    public void clickAtCoordinates(int x, int y) {
         System.out.println("\nTrying to click at screen coordinates: (" + x + ", " + y + ")");
         page.mouse().click(x, y);
+    }
+
+
+    /**
+     * Moves the mouse to an element, then slightly offsets it by (1,1).
+     *
+     * @param path selector for the element
+     */
+    public void moveMouseSlightly(String path) {
+        Locator element = page.locator(path).first();
+
+        // Ensure element is visible and stable
+        element.waitFor();
+
+        // Get element bounding box
+        BoundingBox box = element.boundingBox();
+        if (box == null) {
+            throw new RuntimeException("Element has no bounding box (not visible)");
+        }
+
+        // Move to element center first
+        double startX = box.x + box.width / 2;
+        double startY = box.y + box.height / 2;
+
+        page.mouse().move(startX, startY);
+
+        // Move slightly (1px right, 1px down)
+        page.mouse().move(startX + 1, startY + 1);
+    }
+
+    // Scrolls inside a specific element by a given number of pixels
+    public void makeScroll(String path, int scrollPixels) {
+        System.out.println("Making " + scrollPixels + " px scroll -> ");
+
+        // Locate the scrollable element
+        Locator scrollContainer = page.locator(path).first();
+
+        // Execute scroll داخل the element
+        scrollContainer.evaluate(
+                "(el, pixels) => el.scrollTop = el.scrollTop + pixels",
+                scrollPixels
+        );
+
+        // Small wait (Playwright way)
+        page.waitForTimeout(1000);
+    }
+
+    // Calculates the combined height of all matching elements, including padding per element
+    public int getCombinedHeightOfElements(String path, int padding) {
+        int totalHeight = 0;
+
+        Locator elements = page.locator(path).first();
+        int count = elements.count();
+
+        for (int i = 0; i < count; i++) {
+            Locator element = elements.nth(i);
+
+            // Get element height via bounding box
+            Double height = element.boundingBox() != null
+                    ? element.boundingBox().height
+                    : 0;
+
+            totalHeight += height.intValue() + padding;
+        }
+
+        return totalHeight;
+    }
+
+    public void scrollElementToTop(String path) {
+        Locator element = page.locator(path).first();
+        element.waitFor(); // ensure it's attached & visible
+        element.evaluate("el => el.scrollTop = 0");
+    }
+
+    public void scrollElementToBottom(String path) {
+        Locator element = page.locator(path).first();
+        element.waitFor(); // ensure element is ready
+        element.evaluate("el => el.scrollTop = el.scrollHeight");
     }
 
 }

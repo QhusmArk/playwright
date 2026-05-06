@@ -4,6 +4,8 @@ import com.example.playwright.config.TestEnvironment;
 import com.example.playwright.helpers.enums.DeviceType;
 import com.example.playwright.helpers.enums.ProviderType;
 import com.example.playwright.hooks.BrowserHooks;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.TimeoutError;
 
 import java.util.stream.IntStream;
@@ -492,7 +494,59 @@ public class Navigate {
         BrowserHooks.getPage().reload();
     }
 
+    public static String getSearchIdFromUrl() {
+        String currentUrl = getCurrentUrl();
+        String target = "views/";
+        int start = currentUrl.indexOf(target) + target.length();
 
+        String searchId;
+        try {
+            // Find the position of the first slash after "views/"
+            int nextSlash = currentUrl.indexOf('/', start);
+
+            // Extract and return the substring between views/ and next slash
+            searchId = currentUrl.substring(start, nextSlash);
+        } catch (StringIndexOutOfBoundsException e) {
+            // If url ends with search id
+            searchId = currentUrl.substring(start);
+        }
+
+        searchId = (searchId.contains("?goBackTo=project_measure_points"))
+                ? searchId.replace("?goBackTo=project_measure_points", "")
+                : searchId;
+
+        if (searchId.length() != 36) throw new IllegalStateException("A search id should be 36 chars but url was: " + currentUrl);
+
+        return searchId;
+    }
+
+    /**
+     * Waits up to 10 seconds for the current URL to contain the given string.
+     *
+     * @param expectedSubstring substring to check in URL
+     * @return true if condition met within timeout, otherwise false
+     */
+    public static boolean waitForUrlContains(String expectedSubstring) {
+        try {
+            BrowserHooks.getPage().waitForURL(
+                    url -> url.contains(expectedSubstring),
+                    new Page.WaitForURLOptions().setTimeout(10_000)
+            );
+            return true;
+        } catch (PlaywrightException e) {
+            return false;
+        }
+    }
+
+    public static String getLevelFromUrl() {
+        String currentUrl = getCurrentUrl();
+        if  (currentUrl.contains("company")) { return "company"; }
+        else if (currentUrl.contains("project")) {
+            return "project";
+        } else {
+            throw new IllegalStateException("Could not fathom if we're in account- or project level.");
+        }
+    }
 
 
 }

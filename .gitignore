@@ -14,7 +14,8 @@ target/
 
 .idea/
 src/test/resources/twilio.properties
-devel.feature
+src/test/resources/features/devel
+src/test/java/com/example/playwright/steps/DevelGlue.java
 cookie.properties
 config.properties
 twilio.properties

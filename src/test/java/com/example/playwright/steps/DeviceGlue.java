@@ -7,7 +7,6 @@ import com.example.api.models.device.Device;
 import com.example.helpers.AssertionHelpers;
 import com.example.helpers.Randomizer;
 import com.example.helpers.TimeConverter;
-import com.example.helpers.testData.Context;
 import com.example.playwright.components.aside.Aside;
 import com.example.playwright.components.aside.asideItems.listItems.DeviceItem;
 import com.example.playwright.components.panels.DeviceSettingsMonitoringPanel;
@@ -52,12 +51,6 @@ public class DeviceGlue extends BaseGlue {
     public void iClickOn(String detail) {
         devicePO.clickDeviceDetails(detail);
         PlaywrightActions.sleep(2);
-    }
-
-    private final Context context;
-
-    public DeviceGlue(Context context) {
-        this.context = context;
     }
 
     @When("I search for a Device")

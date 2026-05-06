@@ -1,9 +1,7 @@
 package com.example.helpers.testData;
 
-import com.example.api.RequestService;
 import com.example.api.endpoints.*;
 import com.example.api.glue.ApiChangeGlue;
-import com.example.api.helpers.builders.*;
 import com.example.api.models.ScheduledReport;
 import com.example.api.models.agenda.Agenda;
 import com.example.api.models.agenda.Definition;
@@ -24,15 +22,17 @@ import com.example.api.models.user.User;
 import com.example.helpers.JsonUtil;
 import com.example.helpers.Randomizer;
 import com.example.helpers.TimeConverter;
+import com.example.helpers.builders.*;
 import com.example.playwright.config.DeviceProperties;
 import com.example.playwright.config.TestDataReader;
 import com.example.playwright.config.TestEnvironment;
+import com.example.playwright.hooks.ScenarioContext;
 
 import java.util.*;
 
-import static com.example.api.helpers.builders.BuilderFactory.Providers.MESSAGE_RULE;
-import static com.example.api.helpers.builders.NotificationMpValueBuilder.TriggType.ABSOLUTE;
-import static com.example.api.helpers.builders.NotificationMpValueBuilder.TriggType.TRIGGER;
+import static com.example.helpers.builders.BuilderFactory.Providers.MESSAGE_RULE;
+import static com.example.helpers.builders.NotificationMpValueBuilder.TriggType.ABSOLUTE;
+import static com.example.helpers.builders.NotificationMpValueBuilder.TriggType.TRIGGER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestDataBuilder {
@@ -48,7 +48,7 @@ public class TestDataBuilder {
     private int projectId;
 
     public TestDataBuilder(final Context context, final String directory) {
-        RequestService.setUp();
+//        RequestService.setUp();
         this.directory = directory + "/";
         this.context = context;
     }
@@ -78,7 +78,7 @@ public class TestDataBuilder {
 
         files.forEach(this::buildAll);
 
-        context().storeMeasuringPointDevices();
+        context.storeMeasuringPointDevices();
         validateContext();
     }
 
@@ -107,14 +107,14 @@ public class TestDataBuilder {
 
                 int contextHasThisManyOfThisProvider = switch (uniqueFileProvider) {
                     case "project" -> 1;
-                    case "agenda" -> sizeOrZero(context().getAgendas());
-                    case "blast" -> sizeOrZero(context().getBlasts());
-                    case "comment" -> sizeOrZero(context().getComments());
-                    case "search" -> sizeOrZero(context().getSearches());
-                    case "measuringpoint" -> sizeOrZero(context().getMeasuringPoints());
-                    case "messagerule" -> sizeOrZero(context().getMessageRules());
-                    case "user" -> sizeOrZero(context().getUsers());
-                    case "scheduledreport" -> sizeOrZero(context().getScheduledReports());
+                    case "agenda" -> sizeOrZero(context.getAgendas());
+                    case "blast" -> sizeOrZero(context.getBlasts());
+                    case "comment" -> sizeOrZero(context.getComments());
+                    case "search" -> sizeOrZero(context.getSearches());
+                    case "measuringpoint" -> sizeOrZero(context.getMeasuringPoints());
+                    case "messagerule" -> sizeOrZero(context.getMessageRules());
+                    case "user" -> sizeOrZero(context.getUsers());
+                    case "scheduledreport" -> sizeOrZero(context.getScheduledReports());
                     default -> {
                         System.out.println("context:");
                         JsonUtil.jsonToPrint(context);
@@ -307,11 +307,11 @@ public class TestDataBuilder {
         builder.build();
 
         Agenda agenda = AgendaApi.createAgenda(projectId, builder.buildJson());
-        context().addAgenda(agenda);
+        context.addAgenda(agenda);
     }
 
     private void buildBlast(final TestDataReader prop)  {
-        if (context().getProject().getBlastStandard() == null) {
+        if (context.getProject().getBlastStandard() == null) {
             throw new IllegalStateException("Cannot add blast to a project without blast standard.");
         }
 
@@ -335,7 +335,7 @@ public class TestDataBuilder {
         builder.build();
 
         Blast blast = BlastApi.createBlast(projectId, builder.buildJson());
-        context().addBlast(blast);
+        context.addBlast(blast);
     }
 
     private void buildComment(final TestDataReader prop) {
@@ -351,7 +351,7 @@ public class TestDataBuilder {
         builder.build();
 
         Comment comment = CommentApi.createComment(projectId, builder.buildJson());
-        context().addComment(comment);
+        context.addComment(comment);
     }
 
     private void buildSearch(final TestDataReader prop) {
@@ -390,16 +390,16 @@ public class TestDataBuilder {
                 ? SearchApi.createSearch(projectId, builder.buildJson(), false)
                 : SearchApi.createSearch(projectId, builder.buildJson(), true);
 
-        context().addSearch(search);
+        context.addSearch(search);
 
-        // In the 'old' days the finished Search was used to fetch the full DataReport (using buildDataReport(prop), and add it to context().
+        // In the 'old' days the finished Search was used to fetch the full DataReport (using buildDataReport(prop), and add it to context.
         // We don't do that anymore, as the time consuming part was waiting for POST /search to finish.
         // If DataReport is needed we fetch it from the api.
 
         // This is a test too see if context is as stable as ReportApi, and if the comment above is not valid.
         if (!prop.hasKey("dont_wait_for_search_to_be_finished")) {
             DataReport report = ReportApi.getData(projectId, search.getId());
-            context().addReport(report);
+            context.addReport(report);
         }
     }
 
@@ -424,7 +424,7 @@ public class TestDataBuilder {
 
     private void addMeasuringPointsToSearchBuilder(final TestDataReader prop, SearchBuilder builder) {
         // Fetch all the created measuring points
-        List<MeasuringPoint> measuringPoints = context().getMeasuringPoints();
+        List<MeasuringPoint> measuringPoints = context.getMeasuringPoints();
         if (measuringPoints.isEmpty()) {
             throw new IllegalStateException("A Search requires at least one Measuring Point");
         } else {
@@ -464,7 +464,7 @@ public class TestDataBuilder {
                 .withRecurringTime(prop.getString("recurringTime")) // eg 06:00
                 .withDisabled(prop.getBoolean("disabled"));
 
-        int projectId = context().getProject().getId();
+        int projectId = context.getProject().getId();
 
         // Add the mp's in the properties-file, to the SDR
         List<String> mpNames = prop.getStringArray("measurePointNames", ",");
@@ -494,7 +494,7 @@ public class TestDataBuilder {
 
         ScheduledReport sdr = ReportApi.createSDR(projectId, builder.buildJson());
 
-        context().addScheduledReport(sdr);
+        context.addScheduledReport(sdr);
     }
 
     private void buildMeasuringPoint(final TestDataReader prop) {
@@ -559,10 +559,10 @@ public class TestDataBuilder {
             measuringPoint = addVibrationAgendaToMeasuringPoint(builder, measuringPointId, prop);
         }
 
-        context().addMeasuringPoint(measuringPoint);
+        context.addMeasuringPoint(measuringPoint);
 
 //        // Add mp-sensors to ease access
-        context().storeMeasuringPointDevice(measuringPoint);
+        context.storeMeasuringPointDevice(measuringPoint);
     }
 
     private void addConnectedDevicesToMeasuringPointBuilder(MeasuringPointBuilder builder, TestDataReader prop) {
@@ -617,7 +617,7 @@ public class TestDataBuilder {
     }
 
     private MeasuringPoint addLcustomAgendaToMeasuringPoint(MeasuringPointBuilder builder, int measuringPointId, TestDataReader prop) {
-            Agenda agenda = context().getLastAgenda();
+            Agenda agenda = context.getLastAgenda();
             List<Definition> definitions = agenda.getDefinitions();
 
             int positions = definitions.size() + 1;
@@ -637,7 +637,7 @@ public class TestDataBuilder {
     }
 
     private MeasuringPoint addNoiseAgendaToMeasuringPoint(MeasuringPointBuilder builder, int measuringPointId, TestDataReader prop) {
-            Agenda agenda = context().getLastAgenda();
+            Agenda agenda = context.getLastAgenda();
 
             int labels = agenda.getLabels().size() - 1;
 
@@ -657,7 +657,7 @@ public class TestDataBuilder {
 
 
     private MeasuringPoint addVibrationAgendaToMeasuringPoint(MeasuringPointBuilder builder, int measuringPointId, TestDataReader prop) {
-            Agenda agenda = context().getLastAgenda();
+            Agenda agenda = context.getLastAgenda();
 
             int timeslots = agenda.getLabels().size() - 1;
 
@@ -739,11 +739,11 @@ public class TestDataBuilder {
 
         MessageRule messageRule = MessageRuleApi.createMessageRule(projectId, builder.buildJson());
 
-        context().addMessageRule(messageRule);
+        context.addMessageRule(messageRule);
 
         // Support for connecting multiple mp to a notification_mp_value, ie to a message_rule
         if (prop.hasKey("connect-to-mp")) {
-            List<MeasuringPoint> measuringPoints = context().getMeasuringPoints();
+            List<MeasuringPoint> measuringPoints = context.getMeasuringPoints();
 
             List<String> mpsToConnectTo = prop.splitByComma(prop.getString("connect-to-mp"));
 
@@ -860,7 +860,7 @@ public class TestDataBuilder {
         NotificationMpValue notificationMpValue = NotificationMpValueApi.createNotificationMpValue(
                 projectId, messageRuleId, builder.buildJson());
 
-        context().addNotificationMpValue(notificationMpValue);
+        context.addNotificationMpValue(notificationMpValue);
     }
 
     private void buildProject(final TestDataReader prop) {
@@ -878,10 +878,10 @@ public class TestDataBuilder {
 
         String description = prop.hasKey("description")
                 ? prop.getString("description") +
-                    ((Scenariocontext().getScenarioName() != null)
-                        ? ", " + Scenariocontext().getScenarioName()
+                    ((ScenarioContext.getScenarioName() != null)
+                        ? ", " + ScenarioContext.getScenarioName()
                         : "")
-                : "Scn: " + Scenariocontext().getScenarioName();
+                : "Scn: " + ScenarioContext.getScenarioName();
 
         builder
                 .givenName(newName)
@@ -912,7 +912,7 @@ public class TestDataBuilder {
         Project project = ProjectApi.createProject(builder.buildJson());
         System.out.println("*** Created Project: " + project.getId() + " [" + TestEnvironment.getWebUrl() + "] ***");
 
-        context().setProject(project);
+        context.setProject(project);
         projectId = project.getId();
     }
 
@@ -922,7 +922,7 @@ public class TestDataBuilder {
             System.out.println("Pre existing user. Only add to Project.");
 
             User user = UserApi.getUserByMail(prop.getString("mail"));
-            context().addUser(user);
+            context.addUser(user);
 
             addUserToProject(user);
 
@@ -945,7 +945,7 @@ public class TestDataBuilder {
             builder.build();
 
             User user = UserApi.createUser(builder.buildJson());
-            context().addUser(user);
+            context.addUser(user);
         }
     }
 

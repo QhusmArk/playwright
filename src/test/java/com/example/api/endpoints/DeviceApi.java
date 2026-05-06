@@ -2,8 +2,8 @@ package com.example.api.endpoints;
 
 import com.example.api.RequestService;
 import com.example.api.models.device.*;
-import com.example.playwright.enums.DeviceType;
 import com.example.playwright.helpers.PlaywrightActions;
+import com.example.playwright.helpers.enums.DeviceType;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 

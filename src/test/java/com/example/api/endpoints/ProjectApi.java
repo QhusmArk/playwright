@@ -45,7 +45,9 @@ public class ProjectApi extends ModelApi {
                 .filter(m -> m.getName().equals(projectName))
                 .toList();
 
-        return project.size() > 0 ? project.getFirst() : null;
+        return (project.isEmpty())
+                ? null
+                : project.getFirst();
     }
 
     public static List<Project> getProjectsByName(final String projectName) {

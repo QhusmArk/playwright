@@ -1,8 +1,8 @@
 package com.example.playwright.components.aside.asideItems.listItems;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.helpers.Randomizer;
 import com.example.playwright.components.aside.asideItems.AsideItem;
-import com.sigicom.utils.Randomizer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

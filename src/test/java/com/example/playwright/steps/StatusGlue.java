@@ -4,7 +4,6 @@ import com.example.api.models.device.Device;
 import com.example.api.models.measuringpoint.MeasuringPoint;
 import com.example.api.models.project.Project;
 import com.example.helpers.StatusAssesser;
-import com.example.helpers.StatusAssesser.*;
 import com.example.playwright.components.aside.asideItems.listItems.DeviceItem;
 import com.example.playwright.components.aside.asideItems.listItems.MeasuringPointItem;
 import com.example.playwright.components.aside.asideItems.listItems.ProjectItem;
@@ -16,6 +15,7 @@ import io.cucumber.java.en.When;
 
 import java.util.List;
 
+import static com.example.helpers.StatusAssesser.*;
 import static com.example.helpers.StatusAssesser.Status.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

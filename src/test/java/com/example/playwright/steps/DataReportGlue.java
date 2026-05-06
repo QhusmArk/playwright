@@ -211,13 +211,13 @@ public class DataReportGlue extends BaseGlue {
             String mpName = tableRow.getStringSharedByIconByTableHeader(headerRow, "Measuring point");
             String rowTransientTime = tableRow.getStringByTableHeader(headerRow, "Time");
 
-            Navigate.assertUrlContain("measuring_report");
+            Navigate.waitForUrlContains("measuring_report");
 
             // Open the transient in the leftmost link
             drPO.followShowLinkInMpReport(mpName, rowTransientTime);
 
             // Make sure the transient url is loaded, so that we can read TransientChartView
-            Navigate.assertUrlContain("transients");
+            Navigate.waitForUrlContains("transients");
 
             TransientAnalysisReport transientChart = tcPO.getTransientView();
             String transientChartTimeStamp = transientChart.getTransientTime();
@@ -1103,7 +1103,7 @@ public class DataReportGlue extends BaseGlue {
 
         drPO.clickButton("meatball");
 
-        List<String> actualMenuOptions = drPO.getMenuOptions().stream()
+        List<String> actualMenuOptions = drPO.getCommonMenuOptions().stream()
                 .map(MenuOption::getText)
                 .toList();
 

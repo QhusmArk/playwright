@@ -143,7 +143,8 @@ public class DataReportPO extends CommonPO {
     }
 
     public void clickFirstMeasuringPointsShowButtonToGoToTransientAnalysis() {
-        actions().makeClickOnSomeElements("//table //span[text()='Show']", 1);
+//        actions().makeClickOnSomeElements("//table //span[text()='Show']", 1);
+        actions().makeClick("//table //span[text()='Show']");
         PlaywrightActions.sleep(3);
     }
 

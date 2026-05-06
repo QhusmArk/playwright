@@ -17,7 +17,7 @@ public class UserHooks extends BaseGlue {
 
     @Before(order = 1)
     public void acquireUserWithRole(Scenario scenario) {
-        Scenariocontext().setScenarioName(scenario.getName());
+        ScenarioContext.setScenarioName(scenario.getName());
 
         String requiredRole = resolveRequiredRole(scenario);
 
@@ -63,7 +63,7 @@ public class UserHooks extends BaseGlue {
     @After(order = 100)
     public void clearScenarioContext() {
         deleteProject();
-        Scenariocontext().clear();
+        ScenarioContext.clear();
         TestContextHolder.clear();
     }
 

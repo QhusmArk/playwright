@@ -181,7 +181,9 @@ public class MapPO extends CommonPO {
         }
 
         // Get all map markers
-        List<String> visibleMapMarkers = actions().findAllVisibleElementsAttribute("//main //div[@class='leaflet-pane leaflet-marker-pane leaflet-zoom-hide'] //img", "src");
+//        List<String> visibleMapMarkers = actions().findAllVisibleElementsAttribute("//main //div[@class='leaflet-pane leaflet-marker-pane leaflet-zoom-hide'] //img", "src");
+        List<String> visibleMapMarkers = actions().findManyElementsAttribute("//main //div[@class='leaflet-pane leaflet-marker-pane leaflet-zoom-hide'] //img", "src");
+
         visibleMapMarkers.forEach(mainPane::setMapIcon);
 
         return mainPane;

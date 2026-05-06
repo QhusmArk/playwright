@@ -15,7 +15,7 @@ import com.example.api.models.report.DataReport;
 import com.example.api.models.report.Search;
 import com.example.api.models.user.User;
 import com.example.playwright.config.DeviceProperties;
-import com.example.playwright.enums.DeviceType;
+import com.example.playwright.helpers.enums.DeviceType;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.example.playwright.enums.DeviceType.D10;
-import static com.example.playwright.enums.DeviceType.POINT;
+import static com.example.playwright.helpers.enums.DeviceType.D10;
+import static com.example.playwright.helpers.enums.DeviceType.POINT;
 
 @Data
 public class Context {

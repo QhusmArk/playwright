@@ -2,9 +2,9 @@ package com.example.api.glue;
 
 import com.example.api.endpoints.DeviceApi;
 import com.example.api.endpoints.UserApi;
-import com.example.api.helpers.AssertionHelpers;
-import com.example.api.helpers.JsonHelpers;
 import com.example.api.models.device.*;
+import com.example.helpers.AssertionHelpers;
+import com.example.helpers.JsonHelpers;
 import com.example.helpers.hardware.JenkinsDeviceSSHConnector;
 import com.example.helpers.testData.Context;
 import com.example.playwright.config.DeviceProperties;
@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import static com.example.playwright.helpers.enums.DeviceType.C22;
 import static java.util.Arrays.copyOfRange;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ApiDeviceGlue extends BaseGlue {
 

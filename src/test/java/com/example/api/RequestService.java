@@ -133,7 +133,7 @@ public class RequestService {
                                         final String user,
                                         final String pw,
                                         final boolean followRedirect) {
-
+        // Added try/catch so that we can instruct user to use VPN if UnknownHostException is caught.
         try {
             RequestSpecification spec = given()
                     .auth().preemptive().basic(user, pw)

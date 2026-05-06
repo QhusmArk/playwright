@@ -53,7 +53,8 @@ public class ProjectPO extends CommonPO {
         actions().elementExistAndVisible("//*[@data-qa-id='find-location-field']//input", true, 4);
         // Type location and select the first row of addresses suggested String OpenStreetMap
         actions().clearAndType("//*[@data-qa-id='find-location-field']//input", location);
-        actions().makeClickOnSomeElements("//*[@data-qa-id='find_location_result_item']", 1);
+//        actions().makeClickOnSomeElements("//*[@data-qa-id='find_location_result_item']", 1);
+        actions().makeClick("//*[@data-qa-id='find_location_result_item']");
     }
 
     //  ../company/devices/create_project

@@ -58,7 +58,6 @@ public class AuthenticateGlue extends BaseGlue {
         boolean atLoginPage = assertUrlContain("/login");
 
         //locate session id
-//        boolean isSessionIdCookieDeletedFromDriver = Navigate.isCookieInDriver("sessionid");
         boolean isSessionIdCookieDeletedFromDriver = BrowserHooks.getCookie("sessionid") == null;
 
         //if url contains /login and cookie is gone it's a success.

@@ -58,7 +58,8 @@ public class DevicePO extends CommonPO {
     }
 
     public void setLocation() {
-        actions().makeClickOnSomeElements(FORM_ARROWS, 1);
+//        actions().makeClickOnSomeElements(FORM_ARROWS, 1);
+        actions().makeClick(FORM_ARROWS);
         actions().makeClick("//div[text()='Manual position']");
         actions().clearAndType("//input[@aria-label='Latitude']", Integer.toString(Randomizer.randomInt(0, 90)));
         actions().clearAndType("//input[@aria-label='Longitude *']", Integer.toString(Randomizer.randomInt(0, 180)));
@@ -66,7 +67,8 @@ public class DevicePO extends CommonPO {
     }
 
     public void setTime() {
-        actions().makeClickOnSomeElements(FORM_ARROWS, 1);
+//        actions().makeClickOnSomeElements(FORM_ARROWS, 1);
+        actions().makeClick(FORM_ARROWS);
         actions().makeClickOnSomeElements("//div[@class='q-virtual-scroll__content'] //div[@role='option']", Randomizer.randomInt(0, 29));
     }
 

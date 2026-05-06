@@ -1,15 +1,16 @@
 package com.example.playwright.pageObjects;
 
-import com.example.api.models.measuringpoint.Settings;
 import com.example.playwright.components.aside.Aside;
 import com.example.playwright.components.aside.asideItems.AsideItem;
 import com.example.playwright.components.aside.asideItems.listItems.*;
 import com.example.playwright.components.panels.TableColumnSettingsPanel;
 import com.example.playwright.components.parts.*;
 import com.example.playwright.components.parts.panelParts.PanelHeader;
+import com.example.playwright.helpers.Navigate;
 import com.example.playwright.helpers.PlaywrightActions;
 import com.example.playwright.helpers.enums.AsideSize;
 import com.example.playwright.helpers.enums.ProviderType;
+import com.example.playwright.hooks.BrowserHooks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -216,11 +217,11 @@ public class AsidePO extends CommonPO {
     }
 
     private int getExpectedOverviewListItems() {
-        return switch (actions().getLevelFromUrl()) {
+        return switch (Navigate.getLevelFromUrl()) {
             case "project" -> 10;
             case "company" ->
                  actions().countHowManyElements("//div[@data-qa-id='aside-list'] //div[@class='q-virtual-scroll__content'] //div[@data-qa-id='list-item']");
-            default -> throw new IllegalStateException("Unexpected level: " + actions().getLevelFromUrl());
+            default -> throw new IllegalStateException("Unexpected level: " + Navigate.getLevelFromUrl());
         };
     }
 
@@ -228,41 +229,27 @@ public class AsidePO extends CommonPO {
      * Dynamic listitems, like Device, change in height depending on what information to show (Warning, Change_status, etc)
      */
     public int getFirstScrollIndexForDynamicListItems(int actualItemsInDOM) {
-        String browser = Settings.getBrowser();
-        String os = Settings.detectOS();
+        boolean isHeadless = BrowserHooks.isHeadless();
 
         int totalHeight = actions().getCombinedHeightOfElements("//div[@data-qa-id='aside-list']/div/div[@class='q-virtual-scroll__content']/div", 8);
 
         int averageHeight = (totalHeight / actualItemsInDOM) - 1;   // vid uncommitted lästes firstBatchLast och secondBatchFirst in som samma
 
-        switch (browser) {
-            case "chrome_headless" -> {
-                return (actualItemsInDOM * averageHeight) + (8 * averageHeight);
-            }
-            case "chrome" -> {
-                return (actualItemsInDOM * averageHeight) + (6 * averageHeight);
-            }
-            default -> throw new IllegalArgumentException("Unsupported browser option: " + browser);
-        }
+        return (isHeadless)
+                ? (actualItemsInDOM * averageHeight) + (8 * averageHeight)
+                : (actualItemsInDOM * averageHeight) + (6 * averageHeight);
     }
 
     public int getListItemFirstScrollIndex(int actualItemsInDOM) {
-        String browser = Settings.getBrowser();
-        String os = Settings.detectOS();
+        boolean isHeadless = BrowserHooks.isHeadless();
 
         int totalHeight = actions().getCombinedHeightOfElements("//div[@data-qa-id='aside-list']/div/div[@class='q-virtual-scroll__content']/div", 8);
 
         int averageHeight = totalHeight / actualItemsInDOM;
 
-        switch (browser) {
-            case "chrome_headless" -> {
-                return (actualItemsInDOM * averageHeight) + (8 * averageHeight);
-            }
-            case "chrome" -> {
-                return (actualItemsInDOM * averageHeight) + (6 * averageHeight);
-            }
-            default -> throw new IllegalArgumentException("Unsupported browser option: " + browser);
-        }
+        return (isHeadless)
+                ? (actualItemsInDOM * averageHeight) + (8 * averageHeight)
+                : (actualItemsInDOM * averageHeight) + (6 * averageHeight);
         /*  // to be used for fixing scrolling on qa_computer
                 return switch (browser) {
             case "chrome_headless" -> switch (os) {
@@ -277,9 +264,6 @@ public class AsidePO extends CommonPO {
     }
 
     public int getListItemFollowingScrollIndex(int actualItemsInDOM) {
-        String browser = Settings.getBrowser();
-        String os = Settings.detectOS();
-
         int totalHeight = actions().getCombinedHeightOfElements("//div[@data-qa-id='aside-list']/div/div[@class='q-virtual-scroll__content']/div", 8);
         int averageHeight = (totalHeight / actualItemsInDOM) - 1;   // the '-1' was needed to not scroll too much in Projects and Users.
 
@@ -287,28 +271,17 @@ public class AsidePO extends CommonPO {
     }
 
     private int getTableRowFirstScrollIndex(int actualRowsInDOM) {
-        String browser = Settings.getBrowser();
-        String os = Settings.detectOS();
+        boolean isHeadless = BrowserHooks.isHeadless();
 
         int totalHeight = actions().getCombinedHeightOfElements("//table/tbody[@class='q-virtual-scroll__content']/tr", 0);
         int averageHeight = totalHeight / actualRowsInDOM;
 
-        switch (browser) {
-            case "chrome_headless" -> {
-                return (actualRowsInDOM * averageHeight) + (19 * averageHeight);    // ok
-            }
-            case "chrome" -> {
-                return (actualRowsInDOM * averageHeight) + (6 * averageHeight);
-            }
-            default -> throw new IllegalArgumentException("Unsupported browser option: " + browser);
-        }
-
+        return (isHeadless)
+                ? (actualRowsInDOM * averageHeight) + (19 * averageHeight)
+                : (actualRowsInDOM * averageHeight) + (6 * averageHeight);
     }
 
     private int getTableRowFollowingScrollIndex(int actualRowsInDOM) {
-        String browser = Settings.getBrowser();
-        String os = Settings.detectOS();
-
         int totalHeight = actions().getCombinedHeightOfElements("//table/tbody[@class='q-virtual-scroll__content']/tr", 0);
         int averageHeight = totalHeight / actualRowsInDOM;
 
