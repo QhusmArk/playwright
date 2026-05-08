@@ -1,7 +1,6 @@
 package com.example.playwright.steps;
 
 import com.example.api.models.report.Search;
-import com.example.helpers.testData.Context;
 import com.example.playwright.config.DeviceProperties;
 import com.example.playwright.helpers.Navigate;
 import com.example.playwright.helpers.PlaywrightActions;
@@ -16,25 +15,16 @@ import static com.example.playwright.helpers.enums.DeviceType.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NavigateGlue extends BaseGlue {
-    Context context = context();
+//    Context context = context();
 
     @And("I navigate to account {string}")
     public void iNavigateToAccount(final String endpoint) {
         switch (endpoint) {
+            case "project details" -> Navigate.companyProjects(context().getProject().getId()).details().get();
             case "devices" -> Navigate.company().devices().get();
             case "projects" -> Navigate.company().projects().get();
             case "users" -> Navigate.company().users().get();
             case "overview" -> Navigate.company().overview().get();
-            default -> throw new IllegalArgumentException("Unknown endpoint");
-        }
-    }
-
-    @And("I navigate to project {int} {string}")
-    public void iNavigateToProject(final int projectId, final String endpoint) {
-        switch (endpoint) {
-            case "devices" -> Navigate.project(projectId).devices().get();
-            case "users" -> Navigate.project(projectId).users().get();
-            case "overview" -> Navigate.project(projectId).overview().get();
             default -> throw new IllegalArgumentException("Unknown endpoint");
         }
     }
@@ -118,7 +108,6 @@ public class NavigateGlue extends BaseGlue {
                 .get();
     }
 
-    // todo: merge with iNavigateToProject() in some way?
     // Typ låta några av top-level provider anrop hamna här. Och låta sub-level-anropen vara kvar i andra metoden?
     @Given("I am in project {string}")
     public void iAmInProjectProvider(String provider) {
@@ -126,7 +115,7 @@ public class NavigateGlue extends BaseGlue {
             provider = "measure_points";
         }
         ProviderType type = ProviderType.fromEndpoint(provider);
-        Navigate.project(context.getProject().getId())
+        Navigate.project(context().getProject().getId())
                 .provider(type)
                 .get();
     }
@@ -136,9 +125,9 @@ public class NavigateGlue extends BaseGlue {
     @And("I am at project message rules settings {string}")
     public void openMessageRuleSettings(String endpoint) {
         switch (endpoint) {
-            case "recipients" -> Navigate.project(context.getProject().getId()).messageRule(context.getMessageRules().getFirst().getId()).settings().recipients().get();
-            case "settings general" -> Navigate.project(context.getProject().getId()).messageRule(context.getMessageRules().getFirst().getId()).settings().general().get();
-            case "content" -> Navigate.project(context.getProject().getId()).messageRule(context.getMessageRules().getFirst().getId()).settings().content().get();
+            case "recipients" -> Navigate.project(context().getProject().getId()).messageRule(context().getMessageRules().getFirst().getId()).settings().recipients().get();
+            case "settings general" -> Navigate.project(context().getProject().getId()).messageRule(context().getMessageRules().getFirst().getId()).settings().general().get();
+            case "content" -> Navigate.project(context().getProject().getId()).messageRule(context().getMessageRules().getFirst().getId()).settings().content().get();
             default -> throw new IllegalStateException("Unexpected endpoint value: " + endpoint);
         }
     }
@@ -146,7 +135,7 @@ public class NavigateGlue extends BaseGlue {
     @And("I am at measuring point {string}")
     public void iAmAtMeasuringPointCoordinates(String endpoint) {
         switch (endpoint) {
-            case "coordinates" -> Navigate.project(context.getProject().getId()).measurePoint(context.getMeasuringPoints().getFirst().getId()).settings().coordinates().get();
+            case "coordinates" -> Navigate.project(context().getProject().getId()).measurePoint(context().getMeasuringPoints().getFirst().getId()).settings().coordinates().get();
             default -> throw new IllegalStateException("Unexpected endpoint value: " + endpoint);
         }
     }
@@ -154,8 +143,8 @@ public class NavigateGlue extends BaseGlue {
     @And("I am at project blast {string}")
     public void openBlast(String endpoint) {
         switch (endpoint) {
-            case "create" -> Navigate.project(context.getProject().getId()).blasts().create().get();
-            case "settings general" -> Navigate.project(context.getProject().getId()).blast(context.getBlasts().getFirst().getId()).settings().general().get();
+            case "create" -> Navigate.project(context().getProject().getId()).blasts().create().get();
+            case "settings general" -> Navigate.project(context().getProject().getId()).blast(context().getBlasts().getFirst().getId()).settings().general().get();
             default -> throw new IllegalStateException("Unexpected endpoint value: " + endpoint);
         }
     }
@@ -167,7 +156,7 @@ public class NavigateGlue extends BaseGlue {
                     .billingReports()
                     .create()
                     .get();
-            case "Project" -> Navigate.project(context.getProject().getId())
+            case "Project" -> Navigate.project(context().getProject().getId())
                     .billingReports()
                     .create()
                     .get();
@@ -211,38 +200,38 @@ public class NavigateGlue extends BaseGlue {
 
     @When("{string} view is opened")
     public void iNavigateToProjectReports(String viewPoint) {
-        Search search = context.getLastSearch();
+        Search search = context().getLastSearch();
 
         switch (viewPoint) {
-            case "intervals chart" -> Navigate.project(context.getProject().getId())
+            case "intervals chart" -> Navigate.project(context().getProject().getId())
                     .view(search.getId())
                     .intervals()
                     .chart()
                     .get();
-            case "intervals table" -> Navigate.project(context.getProject().getId())
+            case "intervals table" -> Navigate.project(context().getProject().getId())
                     .view(search.getId())
                     .intervals()
                     .table()
                     .get();
-            case "transients", "transients table" -> Navigate.project(context.getProject().getId())
+            case "transients", "transients table" -> Navigate.project(context().getProject().getId())
                     .view(search.getId())
                     .transients()
                     .get();
-            case "measuring report" -> Navigate.project(context.getProject().getId())
+            case "measuring report" -> Navigate.project(context().getProject().getId())
                     .view(search.getId())
                     .measuringReport()
                     .get();
-            case "blasts" -> Navigate.project(context.getProject().getId())
+            case "blasts" -> Navigate.project(context().getProject().getId())
                     .view(search.getId())
                     .blasts()
                     .get();
-            case "blast journal" -> { Navigate.project(context.getProject().getId())
+            case "blast journal" -> { Navigate.project(context().getProject().getId())
                     .view(search.getId())
-                    .blast(context.getLastBlast().getId())
+                    .blast(context().getLastBlast().getId())
                     .get();
                 PlaywrightActions.sleep(3);
             }
-            case "regression report" ->         Navigate.project(context.getProject().getId())
+            case "regression report" ->         Navigate.project(context().getProject().getId())
                     .view(search.getId())
                     .regression()
                     .get();
@@ -306,7 +295,7 @@ public class NavigateGlue extends BaseGlue {
     @And("I am in the clients settings page")
     public void iAmInTheClientsSettingsPage() {
         Navigate.company()
-                .user(context.getUsers().getFirst().getId())
+                .user(context().getUsers().getFirst().getId())
                 .settings()
                 .get();
     }
@@ -321,12 +310,12 @@ public class NavigateGlue extends BaseGlue {
     @When("I navigate to project measuring point {string}")
     public void iNavigateToProjectMeasuringPoint(String endpoint) {
         switch (endpoint) {
-            case "vibration-report" -> Navigate.project(context.getProject().getId()).measurePoint(context.getMeasuringPoints().getFirst().getId()).settings().vibrationReport().get();
-            case "settings" -> Navigate.project(context.getProject().getId()).measurePoint(context.getMeasuringPoints().getFirst().getId()).settings().get();
-            case "settings general" -> Navigate.project(context.getProject().getId()).measurePoint(context.getMeasuringPoints().getFirst().getId()).settings().general().get();
-            case "details" -> Navigate.project(context.getProject().getId()).measurePoint(context.getMeasuringPoints().getFirst().getId()).details().get();
-            case "create" -> Navigate.project(context.getProject().getId()).measurePoints().create().get();
-            case "active channels" -> Navigate.project(context.getProject().getId()).measurePoint(context.getMeasuringPoints().getFirst().getId()).settings().activeChannels().get();
+            case "vibration-report" -> Navigate.project(context().getProject().getId()).measurePoint(context().getMeasuringPoints().getFirst().getId()).settings().vibrationReport().get();
+            case "settings" -> Navigate.project(context().getProject().getId()).measurePoint(context().getMeasuringPoints().getFirst().getId()).settings().get();
+            case "settings general" -> Navigate.project(context().getProject().getId()).measurePoint(context().getMeasuringPoints().getFirst().getId()).settings().general().get();
+            case "details" -> Navigate.project(context().getProject().getId()).measurePoint(context().getMeasuringPoints().getFirst().getId()).details().get();
+            case "create" -> Navigate.project(context().getProject().getId()).measurePoints().create().get();
+            case "active channels" -> Navigate.project(context().getProject().getId()).measurePoint(context().getMeasuringPoints().getFirst().getId()).settings().activeChannels().get();
         }
     }
 
@@ -334,10 +323,10 @@ public class NavigateGlue extends BaseGlue {
     public void iNavigateToProjectMessageRulesSettingsGeneral(String endpoint) {
         switch (endpoint) {
 //            case "settings" ->
-            case "settings general" -> Navigate.project(context.getProject().getId()).messageRule(context.getMessageRules().getFirst().getId()).settings().general().get();
+            case "settings general" -> Navigate.project(context().getProject().getId()).messageRule(context().getMessageRules().getFirst().getId()).settings().general().get();
 //            case "details" ->
-            case "settings thresholds" -> Navigate.project(context.getProject().getId()).messageRule(context.getMessageRules().getFirst().getId()).settings().thresholds().get();
-            case "create" -> Navigate.project(context.getProject().getId()).messageRules().create().get();
+            case "settings thresholds" -> Navigate.project(context().getProject().getId()).messageRule(context().getMessageRules().getFirst().getId()).settings().thresholds().get();
+            case "create" -> Navigate.project(context().getProject().getId()).messageRules().create().get();
         }
     }
 

@@ -2321,7 +2321,7 @@ public abstract class CommonPO {
             actions().scrollElementToTop(scrollContainer);
             PlaywrightActions.sleep(1);
 
-            int optionHeight = actions().getCombinedHeightOfElements(contentPath + "[1]", 0);
+            int optionHeight = actions().getCombinedHeightOfElements(contentPath + "[1]", false);
             Set<String> uniqueDropdownContent = new LinkedHashSet<>();
 
             while (true) {
@@ -2558,11 +2558,11 @@ public abstract class CommonPO {
         icon.setType(iconType);
 
         ColourSchema iconColor = getElementColourByCss(iconPath);
-        System.out.println("iconColor: " + iconColor);
+//        System.out.println("iconColor: " + iconColor);
         icon.setColour(iconColor);
 
         String color = actions().getComputedStyle(iconPath, "color");
-        System.out.println("color: " + color);
+//        System.out.println("color: " + color);
 
         return icon;
     }
@@ -2570,7 +2570,7 @@ public abstract class CommonPO {
     // High-level entry point: analyze DOM -> choose scenario -> build icon.
     public Icon getIcon1(final String parentPath) {
         System.out.println("******************* completeGetIcon start *******************");
-        System.out.println("parentPath: " + parentPath);
+//        System.out.println("parentPath: " + parentPath);
 
         String tagName = actions().getTagName(parentPath);
         if ("i".equals(tagName)) {

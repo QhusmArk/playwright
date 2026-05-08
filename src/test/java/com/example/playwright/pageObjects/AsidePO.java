@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import static com.example.playwright.helpers.enums.AsideSize.*;
 import static com.example.playwright.helpers.enums.IconType.ARROW_RIGHT;
 import static com.example.playwright.helpers.enums.ProviderType.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * The class contains methods to interact with and fetch information from a list, which can be displayed in
@@ -114,7 +115,7 @@ public class AsidePO extends CommonPO {
         // Get the counter to how many items we should fetch
         int displayCounter = getExpectedAsideContentCount(COMPACT, providerType);
 
-//        System.out.println("displayCounter: " + displayCounter);
+        System.out.println("displayCounter: " + displayCounter);
 
         // No use continue if there are no listitems
         if (displayCounter == 0) {
@@ -123,7 +124,9 @@ public class AsidePO extends CommonPO {
 
         // Check how many items it the DOM
         int actualItemsInDOM = actions().countHowManyVisibleElements("//div[contains(@data-qa-id, 'items-list')] //div[@data-qa-id='list-item']");
-//        System.out.println("actualItemsInDOM: " + actualItemsInDOM);
+        System.out.println("actualItemsInDOM: " + actualItemsInDOM);
+
+        int currentScrollIteration = 1;
 
         boolean needsScroll = displayCounter > actualItemsInDOM;
 
@@ -159,32 +162,54 @@ public class AsidePO extends CommonPO {
                     ? actualItemsInDOM
                     : limit - foundItems.size();
 
-//            System.out.println("listItemsToGet1: " + listItemsToGet);
-
             // Safety valve, as we cannot have listItemsToGet being more than actualItemsInDOM
             if ((limit - foundItems.size()) > actualItemsInDOM) {
                 listItemsToGet = actualItemsInDOM;
             }
 
-//            System.out.println("listItemsToGet2: " + listItemsToGet);
+//            int nextScrollPlan;
+//            if (providerType.equals(DEVICE) || providerType.equals(DEVICE_INCL_BANNER)) {
+//                nextScrollPlan = (foundItems.isEmpty())
+//                        ? getFirstScrollIndexForDynamicListItems(actualItemsInDOM)
+//                        : getListItemFollowingScrollIndex(actualItemsInDOM);
+//            } else {
+//                nextScrollPlan = (foundItems.isEmpty())
+//                        ? getListItemFirstScrollIndex(actualItemsInDOM)
+//                        : getListItemFollowingScrollIndex(actualItemsInDOM);
+//            }
 
-            int nextScrollPlan;
-            if (providerType.equals(DEVICE) || providerType.equals(DEVICE_INCL_BANNER)) {
-                nextScrollPlan = (foundItems.isEmpty())
-                        ? getFirstScrollIndexForDynamicListItems(actualItemsInDOM)
-                        : getListItemFollowingScrollIndex(actualItemsInDOM);
-            } else {
-                nextScrollPlan = (foundItems.isEmpty())
-                        ? getListItemFirstScrollIndex(actualItemsInDOM)
-                        : getListItemFollowingScrollIndex(actualItemsInDOM);
+            int preScroll = switch (providerType) {
+                case PROJECT, USER -> 792;  // validated
+                case DEVICE, DEVICE_INCL_BANNER -> 835;   // validated wo commit notice
+                default -> 0;
+            };
+
+            /*
+            int totalHeight = actions().getCombinedHeightOfElements("//div[@data-qa-id='aside-list']/div/div[@class='q-virtual-scroll__content']/div", true);
+            int averageHeight = (totalHeight / actualItemsInDOM) - 1;   // vid uncommitted lästes firstBatchLast och secondBatchFirst in som samma
+            return (isHeadless)
+                ? (actualItemsInDOM * averageHeight) + (8 * averageHeight)
+                : (actualItemsInDOM * averageHeight) + (6 * averageHeight);
+             */
+
+            // makePrescroll
+            if (currentScrollIteration == 1) {
+                actions().makeScroll("//div[@data-qa-id='aside-list']/div", preScroll);
+//                int topPaddingHeight2 = actions().getCombinedHeightOfElements("(//div[@class='q-virtual-scroll__padding'])[1]", false);
+//                int contentHeight2 = actions().getCombinedHeightOfElements("//div[@class='q-virtual-scroll__content']", false);
+//                int bottomPaddingHeight2 = actions().getCombinedHeightOfElements("(//div[@class='q-virtual-scroll__padding'])[2]", false);
+//                System.out.println("paddings2:");
+//                System.out.println(topPaddingHeight2 + " " + contentHeight2 + " " + bottomPaddingHeight2 + " = " + (topPaddingHeight2 + contentHeight2 + bottomPaddingHeight2));
             }
 
-//            System.out.println("nextScrollPlan: " + nextScrollPlan);
+            int topPaddingHeight = actions().getCombinedHeightOfElements("(//div[@class='q-virtual-scroll__padding'])[1]", false);
+            int contentHeight = actions().getCombinedHeightOfElements("//div[@class='q-virtual-scroll__content']", false);
+            int bottomPaddingHeight = actions().getCombinedHeightOfElements("(//div[@class='q-virtual-scroll__padding'])[2]", false);
+            System.out.println("paddings:");
+            System.out.println(topPaddingHeight + " " + contentHeight + " " + bottomPaddingHeight + " = " + (topPaddingHeight + contentHeight + bottomPaddingHeight));
 
             // Fetch what's in DOM
             List<T> batchOfListItems = getAllAsideItemsInDOM(providerType, listItemsToGet, hover);
-//            System.out.println("firstInBatch: " + batchOfListItems.getFirst().getMainText());
-//            System.out.println("lastInBatch: " + batchOfListItems.getLast().getMainText());
 
             boolean fulfilledLimit = ((foundItems.size() + batchOfListItems.size()) == limit);
             if (fulfilledLimit) {
@@ -202,14 +227,98 @@ public class AsidePO extends CommonPO {
                 batchOfListItems.subList(0, removeFromLastBatch).clear();  // Removes from the top
             }
 
-//            IntStream.range(0, batchOfListItems.size())
-//                    .forEach(d -> System.out.println(d + ": " + batchOfListItems.get(d).getMainText()));
+            System.out.println("foundItems " + currentScrollIteration);
+            batchOfListItems.forEach(item -> System.out.println(item.getMainText()));
 
             foundItems.addAll(batchOfListItems);
+
+            String actualFirst = foundItems.get(foundItems.size() - actualItemsInDOM).getMainText();
+            String actualLast = foundItems.getLast().getMainText();
+            String expectedLast = "";
+            String expectedFirst = "";
+
+            if (providerType.equals(PROJECT)) {
+                expectedFirst = switch (foundItems.size()) {
+                    case 33 -> "1 Sandra Stuga.";
+                    case 66 -> "C50_microphonic";
+                    case 99 -> "Gabbe testar";
+                    case 132 -> "Krister 1* Test 0001";
+                    case 165 -> "ODI testing bulk actoins";
+                    case 198 -> "qa_sdr";
+                    case 231 -> "Stockholm - Old Town ";
+                    default -> "Test bulk";
+                };
+                expectedLast = switch (foundItems.size()) {
+                    case 33 -> "c50_JD";
+                    case 66 -> "FW_vib_test";
+                    case 99 -> "KimmoTestD10#2";
+                    case 132 -> "ODI testing bulk actions";
+                    case 165 -> "qa_SBR-B";
+                    case 198 -> "Stefan C22 interference test"; // en scroll för lite...
+                    case 231 -> "TR C22";
+                    default -> "xyz";
+                };
+            } else if (providerType.equals(USER)) {
+                expectedFirst = switch (foundItems.size()) {
+                    case 33 -> "Ace of ♠";
+                    case 66 -> "Erim Yildirir";
+                    case 99 -> "KarinB Client +";
+                    case 132 -> "Radoslava Ivanova";
+                    default -> "******";
+                };
+                expectedLast = switch (foundItems.size()) {
+                    case 33 -> "Elin Sommerfeld";
+                    case 66 -> "Karin Client";
+                    case 99 -> "Peter Nordmark";
+                    case 132 -> "test-auto-client-without nbvuho";
+                    default -> "******";
+                };
+            } else if (providerType.equals(DEVICE)) {
+                //  Communicating
+                expectedFirst = switch (foundItems.size()) {
+                    case 33 -> "C50 #117788";
+                    case 66 -> "MICRO #2663";
+                    case 98 -> "C50 #117678";
+                    default -> "******";
+                };
+                expectedLast = switch (foundItems.size()) {
+                    case 33 -> "C20 #102135";
+                    case 66 -> "C50 #117678";
+                    case 98 -> "C50 #129655";
+                    default -> "******";
+                };
+                //  All
+//                expectedLast = switch (foundItems.size()) {
+//                    case 33 -> "102135";
+//                    case 66 -> "117678";
+//                    case 99 -> "5568";
+//                    case 132 -> "8206";
+//                    case 165 -> "31160";
+//                    case 198 -> "31530";
+//                    case 231 -> "9519";
+//                    default -> "******";
+//                };
+            }
+
+            System.out.println("size: " + foundItems.size());
+            System.out.println(expectedFirst + " <-> " + actualFirst);
+            assertEquals(expectedFirst, actualFirst);
+            System.out.println(expectedLast + " <-> " + actualLast);
+            assertEquals(expectedLast, actualLast);
+
+            int nextScrollPlan = switch (providerType) {
+                case PROJECT, USER -> 2460;   // lagom 2455-2460    // validated
+                case DEVICE, DEVICE_INCL_BANNER -> contentHeight - 220;  // lagom -280 - (- 220) // validated wo commit banner
+                default -> 0;
+            };
+
+            System.out.println("currentScrollIteration: " + currentScrollIteration);
+            System.out.println("nextScrollPlan: " + nextScrollPlan);
 
             // Calculate how much we must scroll in order to load new items to DOM
             if (!isLastRun) {
                 actions().makeScroll("//div[@data-qa-id='aside-list']/div", nextScrollPlan);
+                currentScrollIteration++;
             }
         }
 
@@ -225,55 +334,11 @@ public class AsidePO extends CommonPO {
         };
     }
 
-    /**
-     * Dynamic listitems, like Device, change in height depending on what information to show (Warning, Change_status, etc)
-     */
-    public int getFirstScrollIndexForDynamicListItems(int actualItemsInDOM) {
-        boolean isHeadless = BrowserHooks.isHeadless();
-
-        int totalHeight = actions().getCombinedHeightOfElements("//div[@data-qa-id='aside-list']/div/div[@class='q-virtual-scroll__content']/div", 8);
-
-        int averageHeight = (totalHeight / actualItemsInDOM) - 1;   // vid uncommitted lästes firstBatchLast och secondBatchFirst in som samma
-
-        return (isHeadless)
-                ? (actualItemsInDOM * averageHeight) + (8 * averageHeight)
-                : (actualItemsInDOM * averageHeight) + (6 * averageHeight);
-    }
-
-    public int getListItemFirstScrollIndex(int actualItemsInDOM) {
-        boolean isHeadless = BrowserHooks.isHeadless();
-
-        int totalHeight = actions().getCombinedHeightOfElements("//div[@data-qa-id='aside-list']/div/div[@class='q-virtual-scroll__content']/div", 8);
-
-        int averageHeight = totalHeight / actualItemsInDOM;
-
-        return (isHeadless)
-                ? (actualItemsInDOM * averageHeight) + (8 * averageHeight)
-                : (actualItemsInDOM * averageHeight) + (6 * averageHeight);
-        /*  // to be used for fixing scrolling on qa_computer
-                return switch (browser) {
-            case "chrome_headless" -> switch (os) {
-                case "macOS" -> 12;
-                case "Linux" -> 13;
-                default -> throw new IllegalStateException("Unexpected os: " + os);
-            };
-            case "chrome" -> 10;
-            default -> throw new IllegalStateException("Unexpected browser: " + browser);
-        };
-         */
-    }
-
-    public int getListItemFollowingScrollIndex(int actualItemsInDOM) {
-        int totalHeight = actions().getCombinedHeightOfElements("//div[@data-qa-id='aside-list']/div/div[@class='q-virtual-scroll__content']/div", 8);
-        int averageHeight = (totalHeight / actualItemsInDOM) - 1;   // the '-1' was needed to not scroll too much in Projects and Users.
-
-        return (actualItemsInDOM * averageHeight) - (2 * averageHeight);
-    }
 
     private int getTableRowFirstScrollIndex(int actualRowsInDOM) {
         boolean isHeadless = BrowserHooks.isHeadless();
 
-        int totalHeight = actions().getCombinedHeightOfElements("//table/tbody[@class='q-virtual-scroll__content']/tr", 0);
+        int totalHeight = actions().getCombinedHeightOfElements("//table/tbody[@class='q-virtual-scroll__content']/tr", false);
         int averageHeight = totalHeight / actualRowsInDOM;
 
         return (isHeadless)
@@ -282,7 +347,7 @@ public class AsidePO extends CommonPO {
     }
 
     private int getTableRowFollowingScrollIndex(int actualRowsInDOM) {
-        int totalHeight = actions().getCombinedHeightOfElements("//table/tbody[@class='q-virtual-scroll__content']/tr", 0);
+        int totalHeight = actions().getCombinedHeightOfElements("//table/tbody[@class='q-virtual-scroll__content']/tr", false);
         int averageHeight = totalHeight / actualRowsInDOM;
 
         return (actualRowsInDOM * averageHeight);
@@ -315,7 +380,6 @@ public class AsidePO extends CommonPO {
                         throw new IllegalArgumentException("Not yet supported provider: " + providerType);
             };
 
-            System.out.println("mainText: " + i + ": " + asideItem.getMainText());
             collectedListItems.add(asideItem);
 
             System.out.println("******************* end *************************");
@@ -349,7 +413,6 @@ public class AsidePO extends CommonPO {
         for (int c = 1; c <= columnCount; c++) {
             String headerPath = headerRowPath + "/th["+c+"]";
 
-            // todo: Finns det risk att olika providerTypes har olika header?
             String headerText = actions().findOneElementsText(headerPath);
             // Remove the sorting arrow
             if (headerText.contains("\narrow_upward")) {
@@ -369,7 +432,6 @@ public class AsidePO extends CommonPO {
 
         // Get the counter to how many items we should fetch
         int displayCounter = getExpectedAsideContentCount(MEDIUM, providerType);
-//        System.out.println("displayCounter: " + displayCounter);
 
         // No use continue if there are no rows
         if (displayCounter == 0) {
@@ -379,9 +441,8 @@ public class AsidePO extends CommonPO {
         // Check how many items it the DOM
         int actualRowsInDOM = actions().countHowManyVisibleElements(tableRowsPath);
 //        System.out.println("actualRowsInDOM: " + actualRowsInDOM);
-//
+        int currentScrollIteration = 1;
         boolean needsScroll = displayCounter > actualRowsInDOM;
-//        System.out.println("needsScroll: " + needsScroll);
 
         // Do not scroll if we only want a portion of the rows in the DOM
         if (limit != -1) {
@@ -389,7 +450,6 @@ public class AsidePO extends CommonPO {
                 needsScroll = false;
             }
         }
-//        System.out.println("needsScroll: " + needsScroll);
 
         // No use scrolling if all listitems are showing
         if (!needsScroll) {
@@ -402,27 +462,36 @@ public class AsidePO extends CommonPO {
                 listItemsToGet = limit;
             }
 
-//            System.out.println("listItemsToGet no scroll: " + listItemsToGet);
             return getAllAsideTableContentRowsInDOM(headers, providerType, tableRowsPath, listItemsToGet);
         }
+
+        int preScroll = 19 * 48; // validated
 
         while (tableRows.size() < displayCounter) {
             int listItemsToGet =  (limit == -1)
                     ? actualRowsInDOM
                     : limit - tableRows.size();
-//            System.out.println("listItemsToGet1: " + listItemsToGet);
 
             // Safety valve, as we cannot have listItemsToGet being more than actualItemsInDOM
             if ((limit - tableRows.size()) > actualRowsInDOM) {
                 listItemsToGet = actualRowsInDOM;
             }
-//            System.out.println("listItemsToGet2: " + listItemsToGet);
 
-//            System.out.println("tableRows isEmpty: " + tableRows.isEmpty());
-            int nextScrollPlan;
-            nextScrollPlan = (tableRows.isEmpty())
-                    ? getTableRowFirstScrollIndex(actualRowsInDOM)
-                    : getTableRowFollowingScrollIndex(actualRowsInDOM);
+            // makePrescroll
+            if (currentScrollIteration == 1) {
+                actions().makeScroll("//div[@data-qa-id='aside-list']/div/div", preScroll);
+//                int topPaddingHeight2 = actions().getCombinedHeightOfElements("(//div[@class='q-virtual-scroll__padding'])[1]", false);
+//                int contentHeight2 = actions().getCombinedHeightOfElements("//div[@class='q-virtual-scroll__content']", false);
+//                int bottomPaddingHeight2 = actions().getCombinedHeightOfElements("(//div[@class='q-virtual-scroll__padding'])[2]", false);
+//                System.out.println("paddings2:");
+//                System.out.println(topPaddingHeight2 + " " + contentHeight2 + " " + bottomPaddingHeight2 + " = " + (topPaddingHeight2 + contentHeight2 + bottomPaddingHeight2));
+            }
+
+//            int topPaddingHeight = actions().getCombinedHeightOfElements("(//tbody[@class='q-virtual-scroll__padding'])[1]/tr/td", false);
+//            int contentHeight = actions().getCombinedHeightOfElements("//tbody[@class='q-virtual-scroll__content']/tr", false);
+//            int bottomPaddingHeight = actions().getCombinedHeightOfElements("(//tbody[@class='q-virtual-scroll__padding'])[2]/tr/td", false);
+//            System.out.println("paddings:");
+//            System.out.println(topPaddingHeight + " " + contentHeight + " " + bottomPaddingHeight + " = " + (topPaddingHeight + contentHeight + bottomPaddingHeight));
 
             // Fetch what's in DOM
             List<Table.TableRow> batchOfTableRows = getAllAsideTableContentRowsInDOM(headers, providerType, tableRowsPath, listItemsToGet);
@@ -445,9 +514,45 @@ public class AsidePO extends CommonPO {
 
             tableRows.addAll(batchOfTableRows);
 
+//            System.out.println("foundItems " + currentScrollIteration);
+//            batchOfTableRows.forEach(row -> System.out.println(row.getStringAtPosition(1)));
+
+            String actualFirst = batchOfTableRows.getFirst().getStringAtPosition(1);
+            String actualLast = batchOfTableRows.getLast().getStringAtPosition(1);
+            String expectedLast = "";
+            String expectedFirst = "";
+
+            if (providerType.equals(PROJECT)) {
+                expectedFirst = switch (currentScrollIteration) {
+                    case 1 -> "1 Sandra Stuga.";
+                    case 2 -> "EDI Inatantel test";
+                    case 3 -> "Monas Nya Point";
+                    case 4 -> "Roger";
+                    case 5 -> "Todel37";
+                    default -> "xxx";
+                };
+                expectedLast = switch (currentScrollIteration) {
+                    case 1 -> "EDI - Test Instantel 100073 (BE11235)";
+                    case 2 -> "Mona Infra Point test";
+                    case 3 -> "RL test Auto report";
+                    case 4 -> "Thomas Test1";
+                    case 5 -> "xyz";
+                    default -> "xxx";
+                };
+            }
+
+//            System.out.println("size: " + batchOfTableRows.size());
+//            System.out.println(expectedFirst + " <-> " + actualFirst);
+            assertEquals(expectedFirst, actualFirst);
+//            System.out.println(expectedLast + " <-> " + actualLast);
+            assertEquals(expectedLast, actualLast);
+
+            int nextScrollPlan = 57 * 48;   // 57 rows on 1080 px viewport height, 48 px row height
+
             // Calculate how much we must scroll in order to load new items to DOM
             if (!isLastRun) {
-                actions().makeScroll("//div[@data-qa-id='aside-list']/div/div" ,nextScrollPlan);
+                actions().makeScroll("//div[@data-qa-id='aside-list']/div/div", nextScrollPlan);
+                currentScrollIteration++;
             }
         }
 
@@ -468,7 +573,6 @@ public class AsidePO extends CommonPO {
         }
         return tableRows;
     }
-
 
     /**
      * Tables varies depending on ProviderType.
@@ -493,7 +597,7 @@ public class AsidePO extends CommonPO {
                         tableCell.addCellIcon(leftIcon);
 
                         // Then get the text
-                        String cellText = actions().findOneElementsText(cellPath + " //span");
+                        String cellText = actions().findOneElementsText(cellPath + " //span").trim();
                         tableCell.addCellText(cellText);
 
                         tableRow.addContent(tableCell);
@@ -504,7 +608,7 @@ public class AsidePO extends CommonPO {
                         tableRow.addContent(rightButton);
 
                     } else {
-                        String cellText = actions().findOneElementsText(cellPath);
+                        String cellText = actions().findOneElementsText(cellPath).trim();
                         tableRow.addContent(cellText);
                     }
                 }

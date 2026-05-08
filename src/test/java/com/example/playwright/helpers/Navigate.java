@@ -41,6 +41,11 @@ public class Navigate {
         return new Navigate(base() + "#/company");
     }
 
+    // only for /#/company/projects/5657/details?
+    public static Navigate companyProjects(final int projectId) {
+        return new Navigate(base() + "#/company/projects/" + projectId);
+    }
+
     public static Navigate project(final int projectId) {
         return new Navigate(base() + "#/project/" + projectId);
     }

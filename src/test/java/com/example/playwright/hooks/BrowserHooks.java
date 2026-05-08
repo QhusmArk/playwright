@@ -22,11 +22,10 @@ public class BrowserHooks {
 
     private int step = 1;
 
-    // Control headless or not with this boolean
+    // Control headless or not with this boolean. Both have same size. //todo: change headless to larger size to speed up runs? If so, getAside scrolling might need rework.
     @Getter
     private static final boolean isHeadless = true;
 //    private static final boolean isHeadless = false;
-
 
     protected static final ThreadLocal<Playwright> playwright = new ThreadLocal<>();
     protected static final ThreadLocal<Browser> browser = new ThreadLocal<>();
@@ -42,8 +41,8 @@ public class BrowserHooks {
         Browser br = pw.chromium().launch(
                 new BrowserType.LaunchOptions()
                         .setHeadless(isHeadless)
-                        .setSlowMo(300) //     wait 300 milliseconds after each action
-                        .setArgs(List.of("--window-size=900,700"))
+                        .setSlowMo(300) // wait 300 milliseconds after each action
+                        .setArgs(List.of("--window-size=1920,1080"))
         );
         browser.set(br);
 
@@ -51,6 +50,7 @@ public class BrowserHooks {
                 new Browser.NewContextOptions()
                         .setIgnoreHTTPSErrors(true)
                         .setPermissions(List.of()) // no permissions granted
+                        .setViewportSize(1920, 1080)
         );
         context.set(ctx);
 
@@ -59,7 +59,8 @@ public class BrowserHooks {
 
         actions.set(new PlaywrightActions(pg));
 
-        // todo: hitta en bättre plats för den här?
+        // todo: find another home for this line? This is Test requirement, not browser context
+        // and not all tests need RequestService
         RequestService.setUp();
     }
 

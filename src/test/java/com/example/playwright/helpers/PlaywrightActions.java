@@ -57,6 +57,7 @@ public class PlaywrightActions {
      */
     public void setAsideSize(String toValue) {
 
+        // todo: varför sova här?
         try {
             Thread.sleep(2000);
         } catch (InterruptedException exception) {
@@ -166,7 +167,8 @@ public class PlaywrightActions {
     public final boolean elementExistAndVisible(final String path, boolean failTestIfNotFound, int timeoutSeconds) {
         System.out.println("\nTrying to assert if '" + path + "' is visible.");
         int waitTimeMillis = (timeoutSeconds == 0)
-                ? 100
+//                ? 100
+                ? 50
                 : timeoutSeconds * 1000;
 
         return processElementExistAndVisible(path, failTestIfNotFound, waitTimeMillis);
@@ -320,16 +322,14 @@ public class PlaywrightActions {
         try {
             locator.waitFor(new Locator.WaitForOptions()
                     .setState(WaitForSelectorState.VISIBLE)
-                    .setTimeout(timeoutSeconds * 1000));
+//                    .setTimeout(timeoutSeconds * 1000));
+                    .setTimeout(waitTimeMillis));
             return locator;
 
         } catch (PlaywrightException e) {
             throw new PlaywrightException("Unable to find element. Perhaps it's hidden?", e);
         }
     }
-
-
-
 
     private boolean processElementExistAndVisible(String path, boolean failTestIfNotFound, int waitTimeMillis) {
         Locator locator = page.locator(path).first();
@@ -548,7 +548,7 @@ public class PlaywrightActions {
 
     // Scrolls inside a specific element by a given number of pixels
     public void makeScroll(String path, int scrollPixels) {
-        System.out.println("Making " + scrollPixels + " px scroll -> ");
+        System.out.println("Making " + scrollPixels + " px scroll on '" + path + "'-> ");
 
         // Locate the scrollable element
         Locator scrollContainer = page.locator(path).first();
@@ -560,28 +560,43 @@ public class PlaywrightActions {
         );
 
         // Small wait (Playwright way)
-        page.waitForTimeout(1000);
+        sleep(1);
     }
 
     // Calculates the combined height of all matching elements, including padding per element
-    public int getCombinedHeightOfElements(String path, int padding) {
+    public int getCombinedHeightOfElements(String path, boolean includedBottomMargin) {
         int totalHeight = 0;
 
-        Locator elements = page.locator(path).first();
+        Locator elements = page.locator(path);
         int count = elements.count();
 
         for (int i = 0; i < count; i++) {
             Locator element = elements.nth(i);
 
-            // Get element height via bounding box
-            Double height = element.boundingBox() != null
-                    ? element.boundingBox().height
-                    : 0;
-
-            totalHeight += height.intValue() + padding;
+            int height = calculateElementHeight(element, includedBottomMargin);
+            totalHeight += height;
         }
 
         return totalHeight;
+    }
+
+    private int calculateElementHeight(Locator element, boolean includedBottomMargin) {
+        Double height = element.boundingBox() != null
+                ? element.boundingBox().height
+                : 0;
+
+        int bottomMarginHeight = (includedBottomMargin)
+                ? Integer.parseInt(element.evaluate(
+                "el => getComputedStyle(el).marginBottom"
+                    ).toString().replace("px", ""))
+                : 0;
+
+        return height.intValue() + bottomMarginHeight;
+    }
+
+    public int getElementHeight(String path, boolean includedBottomMargin) {
+        Locator element = page.locator(path);
+        return calculateElementHeight(element, includedBottomMargin);
     }
 
     public void scrollElementToTop(String path) {
