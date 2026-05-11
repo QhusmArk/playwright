@@ -3,9 +3,9 @@
 Feature: Data report - Scheduled report
 
 #  @automation
-#  @setUpSeleniumWithAdmin
+#  @loginWithAdmin
 
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   @automation
   Scenario: Scheduled report — create - key availability
     Given there is a project
@@ -29,14 +29,14 @@ Feature: Data report - Scheduled report
       | Daily    | Every day;Weekdays only                  |
       | Weekly   | Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday |
 
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   @automation
   Scenario: Scheduled report — create - measuring point limits
     Given there is a project with 30 measuring points
     And I am at project 'scheduled_reports create'
     Then SDR have limit on 25 measuring points
 
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   @automation
   Scenario: SDR - aside
     Given an SDR project

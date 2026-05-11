@@ -2,7 +2,9 @@ package com.example.playwright.steps;
 
 import com.example.helpers.testData.Context;
 import com.example.helpers.testData.TestContextHolder;
+import com.example.playwright.hooks.BrowserHooks;
 import com.example.playwright.pageObjects.*;
+import com.microsoft.playwright.Page;
 
 
 public class BaseGlue {
@@ -33,6 +35,10 @@ public class BaseGlue {
 
     /** Gives glue classes shared access to common page objects. */
     protected BaseGlue() {
+    }
+
+    protected Page page() {
+        return BrowserHooks.getPage();
     }
 
     /** Returns the context belonging to the current scenario thread. */

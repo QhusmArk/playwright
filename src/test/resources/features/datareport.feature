@@ -3,7 +3,7 @@
 Feature: Data report CRUD
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Create and update a rolling time interval report
     Given there is a project with a measuring point
     And I navigate to project 'data reports create'
@@ -16,7 +16,7 @@ Feature: Data report CRUD
       | 28 days  |
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Create a static time interval report
     Given there is a project with a measuring point
     And I navigate to project 'data reports create'
@@ -24,7 +24,7 @@ Feature: Data report CRUD
     Then there is a temporary interval report in the list
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Save an interval report
     Given there is a project with a temporary interval report
     And I am in project 'views'
@@ -32,7 +32,7 @@ Feature: Data report CRUD
     Then the 'saved' report is found in list
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Share a interval report
     Given there is a project with a saved interval report
     And I am in project 'views'
@@ -40,7 +40,7 @@ Feature: Data report CRUD
     Then the 'shared' report is found in list
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
 Scenario Outline: Filter which data reports to show in list
     Given There is previously created data reports in state temporary, saved and shared
     And I am in project 'views'
@@ -53,7 +53,7 @@ Scenario Outline: Filter which data reports to show in list
       | Shared           |
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify default headers for project Data reports
     Given there is a project with an interval report
     And I am in project 'views'
@@ -66,7 +66,7 @@ Scenario Outline: Filter which data reports to show in list
     And no other headers can be selected
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Delete all previously created Data reports
     Given There is previously created data reports in state temporary, saved and shared
     And I am in project 'views'
@@ -75,7 +75,7 @@ Scenario Outline: Filter which data reports to show in list
 
 # SSD-2872
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Save data report button deactivated if no input
     Given there is a project with a temporary interval report
     And I navigate to project 'data reports'
@@ -84,7 +84,7 @@ Scenario Outline: Filter which data reports to show in list
 
   # SSD-2645
   @automation
-  @setUpSeleniumWithClient
+  @loginWithClient
   Scenario: Validate subUser cannot create a data report from measuring point menu
     Given there is a project with an mp and a client
     When I navigate to project 'measuring points'
@@ -94,7 +94,7 @@ Scenario Outline: Filter which data reports to show in list
 #    Transfer below to new feature file DataReport_vibration/noise_report
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate no copy possible
     Given a vibration report project
     When I open the vibration report
@@ -102,14 +102,14 @@ Scenario Outline: Filter which data reports to show in list
       |Update|Rename|Share|Export|Delete|
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Open pre created Vibration report
     Given a vibration report project
     When I open the vibration report
     Then Vmax and Vper is as expected
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Create Vibration report
     Given a vibration report project
     When I navigate to project 'measuring points'
@@ -119,7 +119,7 @@ Scenario Outline: Filter which data reports to show in list
     Then I am redirected to 'vibration report'
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Create Vibration report from aside - validator
     Given a vibration report project
     And I navigate to project measuring point 'vibration-report'
@@ -133,7 +133,7 @@ Scenario Outline: Filter which data reports to show in list
       |Center map on measuring point |Measuring point settings|Device details|Create data report|
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Add Vibration report agenda to mp
     Given a Project with an MP that has no Agenda
     When I navigate to project measuring point 'vibration-report'
@@ -141,7 +141,7 @@ Scenario Outline: Filter which data reports to show in list
 
   @noProdEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate max and Vper calculation
     Given a vibration report project
     When I open the vibration report

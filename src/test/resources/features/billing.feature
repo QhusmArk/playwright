@@ -3,7 +3,7 @@
 Feature: Billing report
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Project Measuring Points Billing Report - Verify creation
     Given there is a project with two measuring points and two blasts
     When I navigate to 'Project' Billing Report create
@@ -16,7 +16,7 @@ Feature: Billing report
       | Custom       |
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Devices Billing Report - Verify export formats
     When I navigate to 'Account' Billing Report create
     And I create an Account Devices Billing Report for 'Last month'
@@ -27,7 +27,7 @@ Feature: Billing report
   # SSD-2019
   @noStageEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Projects Billing Report - Mp-price should override Project-price
     Given there is a project with default_price and mp with price
     When I create an Account Projects Billing Report by api
@@ -36,7 +36,7 @@ Feature: Billing report
 # SSD-2019
   @noStageEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Projects Billing Report - Mp-price can be set on measuring point
     Given there is a project with an mp and a client
     And I navigate to project measuring point 'settings general'
@@ -47,7 +47,7 @@ Feature: Billing report
 # SSD-2019
   @noStageEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Projects Billing Report - Mp-price can be set on project
     Given there is a project with an mp and a client
     And I navigate to project 'settings general'
@@ -57,7 +57,7 @@ Feature: Billing report
 
   #  SSD-2277
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Devices Billing Report - Validate only sensors
     When I navigate to 'Account' Billing Report create
     Then I can only select sensors for Account Devices Billing Report
@@ -65,7 +65,7 @@ Feature: Billing report
     # SSD-3157
   @noStageEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project Measuring Points Billing Report - Verify default headers with price
     Given there is a project with default_price and mp with price
     When I create a Project Measuring Points Billing Report by api
@@ -73,7 +73,7 @@ Feature: Billing report
       | Report period | Project name | Project ID | Project maintainer | Customer | Customer contact | Project time frame | Measuring point | Measuring point description| Sensor type | Serial number | Active from | Active to | Days active | Price/Measuring point |
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Account Projects Billing Report - Verify creation possible
     When I navigate to 'Account' Billing Report create
     And I create an Account Projects Billing Report for '<Period>'
@@ -86,7 +86,7 @@ Feature: Billing report
 #    Scenario: Abort
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Account Devices Billing Report - Verify creation possible
     When I navigate to 'Account' Billing Report create
     And I create an Account Devices Billing Report for '<Period>'
@@ -101,7 +101,7 @@ Feature: Billing report
   #    SSD-2240
   @noStageEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Devices Billing Report - Validate Days Active in last month
     When I navigate to 'Account' Billing Report create
     And I create an Account Devices Billing Report for 'Last month'
@@ -110,7 +110,7 @@ Feature: Billing report
 
     #  SSD-3064 Project Billing Report changes
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Projects Billing Report - Validate Days Active for one mp w two devices
     Given there is a project with a measuring point that has two devices
     When I use api to create an Account Projects Billing Report from '2023-11-01 00:00' to '2023-11-30 23:59'
@@ -119,7 +119,7 @@ Feature: Billing report
 
     #  SSD-3064 Project Billing Report changes
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Projects Billing Report - Validate Days Active for two mps w one device each
     Given there is a project for Account Projects Billing Report testing
     When I use api to create an Account Projects Billing Report from '2023-11-01 00:00' to '2023-11-30 23:59'
@@ -127,7 +127,7 @@ Feature: Billing report
 
       # SSD-3150
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project Measuring Points Billing report - Project start
     Given there is a project
     When I navigate to 'Project' Billing Report create

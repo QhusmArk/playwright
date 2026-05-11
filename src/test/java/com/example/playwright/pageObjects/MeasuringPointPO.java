@@ -42,15 +42,6 @@ public class MeasuringPointPO extends CommonPO {
         actions().makeClick("//button[@type='submit']");
     }
 
-    /**
-     * Finds map marker if map is zoomed in to display the searched mp's map marker alone
-     * @param mpName the searched map marker
-     * @return if map marker is found
-     */
-    public boolean existOnMap(final String mpName) {
-        return actions().elementExistAndVisible("//img[@src='svg/mp/map-marker-mp-vib-on.svg'][@title='" + mpName + "']");
-    }
-
     public void changeMpActivitySwitchFromDetails() {
             //click on toggle
             actions().makeClick(MP_ACTIVITY_SWITCH);

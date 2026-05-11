@@ -4,7 +4,7 @@ Feature: Aside
 
 # Test general filter functionality for account level provider objects.
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Filter on Company level
     Given I am in account '<Provider>'
     And this filter '<filter>' is active
@@ -18,7 +18,7 @@ Feature: Aside
 
 # Test general filter functionality for project level provider objects (project id hardcoded in glue file).
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Filter on project level
     Given there is a maxed out project
     When I am in project '<Provider>'
@@ -36,7 +36,7 @@ Feature: Aside
 
 # Test device specific filter functionality for account level provider objects.
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Multiple filters in Company level Device
     When I set these filters
       | Monitoring On | Low battery | C20 |
@@ -47,7 +47,7 @@ Feature: Aside
 
   # SSD-2550
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Empty account list due to search yields message
     When I do not get search hit in account 'projects' I get 'No project could be found'
     When I do not get search hit in account 'devices' I get 'No device could be found'
@@ -55,7 +55,7 @@ Feature: Aside
 
   # SSD-2550
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Empty project list due to search yields message
     Given there is a maxed out project
     When I do not get search hit in project 'measure_points' I get 'No measuring point could be found'
@@ -67,7 +67,7 @@ Feature: Aside
 
 #   SSD-2550
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Empty project device list due to search yields message
     Given there is a maxed out project
     When I navigate to project measuring point 'create'
@@ -76,7 +76,7 @@ Feature: Aside
 
     #   SSD-2550
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Empty project list due to none created or added yields message - admin
     Given there is a project without blast standard
     Then I go to project 'measure_points' I get 'No measuring point created Create new'
@@ -88,7 +88,7 @@ Feature: Aside
 
     #  SSD-2078
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate select project checkbox 1
     Given there is a project
     And I am in account 'projects'
@@ -98,7 +98,7 @@ Feature: Aside
 
   #  SSD-2078
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate select project checkbox 2
     Given there is a project
     And I am in account 'projects'
@@ -108,7 +108,7 @@ Feature: Aside
 
   #    SSD-2987
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Devices - Aside - Verify default table headers and selectable
     When I am in account 'devices'
     When aside is 'MEDIUM'
@@ -120,7 +120,7 @@ Feature: Aside
 
     #    SSD-2987
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project Devices - Aside - Verify default table headers and selectable
     Given there is a project with two measuring points and two blasts
     And I am in project 'devices'
@@ -134,7 +134,7 @@ Feature: Aside
   # SSD-2578, SSD-3201, -4268
   @noStageEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify default headers for project measuring points
     Given there is a project with two measuring points and two blasts
     And I am in project 'measuring points'
@@ -149,7 +149,7 @@ Feature: Aside
 
       #  SSD-2922, SSD-2912 (Proj ect bulk),
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account - Aside Header - List - Validate icons and default input value
     When I am in account 'overview'
     Then list header contains icons
@@ -172,7 +172,7 @@ Feature: Aside
 
   #  SSD-2922, SSD-2992 (Mp bulk)
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project - Aside Header - List - Validate icons and default input value
     Given there is a maxed out project
     When I navigate to project 'overview'
@@ -212,7 +212,7 @@ Feature: Aside
 
     #  SSD-2922, SSD-2992 (Mp bulk)
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project - Aside Header - Table - Validate icons and default input value
     Given there is a maxed out project
     When I navigate to project 'measuring points'
@@ -255,7 +255,7 @@ Feature: Aside
 
   #  SSD-2922, SSD-2912 (Project bulk),
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account - Aside Header - Table - Validate icons and default input value
     When I am in account 'projects'
     And aside is 'MEDIUM'
@@ -279,7 +279,7 @@ Feature: Aside
   # SSD-2912 Bulk action, Project
   @NoStageEnv # Checkbox do not work as in Test or Prod
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Bulk action - account devices - Validate list and table behaviour
     Given I am in account 'devices'
     And aside is 'COMPACT'
@@ -298,7 +298,7 @@ Feature: Aside
   # SSD-2992 Bulk action, MP
   @NoStageEnv # Checkbox do not work as in Test or Prod
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Bulk action - project mp - Validate list and table behaviour
     Given there is a project with several measuring points
     And I navigate to project 'measuring points'
@@ -316,7 +316,7 @@ Feature: Aside
 
   # SSD-3016
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Assert active filter do not block selected items for bulk action
     Given I am in account 'devices'
     When I select these for bulk action
@@ -328,7 +328,7 @@ Feature: Aside
 
   # SSD-3016
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Assert no search result do not block selected items for bulk action
     Given I am in account 'devices'
     When I select these for bulk action
@@ -340,7 +340,7 @@ Feature: Aside
 
     #   SSD-3037, -3105
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Aside - Monitoring devices - same sorting in list and table
     Given I am in account 'devices'
     When aside is 'COMPACT'
@@ -350,7 +350,7 @@ Feature: Aside
 
   # SSD-3138, SSD-2299
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: All communicating devices in aside has cogwheel
     Given I am in account 'devices'
     Then cogwheel is visible in COMPACT 'on hover'
@@ -358,7 +358,7 @@ Feature: Aside
 
   #  SSD-3266, SSD-3206, -3236
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Aside and panels commit messages - C22 - uncommitted
     When I create uncommitted change for C22
     Then aside menu show 'uncommitted' change
@@ -368,7 +368,7 @@ Feature: Aside
 
   #  SSD-3266, SSD-3206, -3236
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Aside and panels commit messages - C22 - committed
     When I create committed change for C22
     Then aside menu show 'no' change
@@ -378,7 +378,7 @@ Feature: Aside
 
   #  SSD-3266, SSD-3206, -3236
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Aside and panels commit messages - C22 - discarded
     When I discard change for 'C22'
     Then aside menu show 'no' change
@@ -387,7 +387,7 @@ Feature: Aside
 
   #  SSD-3266, SSD-3206, -3236
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Aside and panels commit messages - S50 - uncommitted
     When I create uncommitted change for S50
     Then aside menu show 'uncommitted' change
@@ -397,7 +397,7 @@ Feature: Aside
 
   #  SSD-3266, SSD-3206, -3236
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Aside and panels commit messages - S50 - committed
     When I create committed change for S50
     Then aside menu show 'no' change
@@ -407,7 +407,7 @@ Feature: Aside
 
   #  SSD-3266, SSD-3206, -3236
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Aside and panels commit messages - S50 - discarded
     When I discard change for 'S50'
     Then aside menu show 'no' change
@@ -415,7 +415,7 @@ Feature: Aside
     And 'D10' list item show 'no' change
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Check icon status from compact list account level
     Then projects has correct status
     And communicating devices in account has correct status
@@ -423,7 +423,7 @@ Feature: Aside
 
       # SSD-3468
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Overview listitems has counter
     Given I am in account 'overview'
     Then aside 'Projects' has counter
@@ -431,7 +431,7 @@ Feature: Aside
     Then aside 'Users' has counter
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Check aside contents from Project level - non blast
     Given there is a maxed out project
     Then I see all project measuring points in '<asideSize>' aside
@@ -445,7 +445,7 @@ Feature: Aside
       | FULL |
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Check list contents from Company level
     Then I see all account projects in '<asideSize>' aside
     And I see all account communicating devices in '<asideSize>' aside

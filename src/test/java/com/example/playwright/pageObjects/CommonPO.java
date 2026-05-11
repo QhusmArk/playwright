@@ -23,7 +23,7 @@ import static com.example.playwright.helpers.enums.IconType.*;
 public abstract class CommonPO {
 
     // If I need to access page from Glue layer, use this
-    protected Page page() {
+    public Page page() {
         return BrowserHooks.getPage();
     }
 
@@ -738,9 +738,15 @@ public abstract class CommonPO {
                 if (text.isEmpty()) {
                     text = actions().findOneElementsAttribute(labelPath + " //input", "value");
 
-                    if (text.isEmpty()) {
+                    // Unclear why we look for placeholder...
+//                    if (text.isEmpty()) {
+//                        text = actions().findOneElementsAttribute(labelPath + " //input", "placeholder");
+//                    }
+                    boolean elementWithPlaceholderExist = actions().elementExistAndVisible(labelPath + " //input[contains(@placeholder,'placeholder')]", false, 0);
+                    if (text.isEmpty() && elementWithPlaceholderExist) {
                         text = actions().findOneElementsAttribute(labelPath + " //input", "placeholder");
                     }
+
                 }
                 inputField.setText(text);
 

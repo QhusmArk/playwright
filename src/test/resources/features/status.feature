@@ -8,7 +8,7 @@ Feature: Status
 #  SSD-2589
   @noStageEnv
     @automation
-    @setUpSeleniumWithAdmin
+    @loginWithAdmin
   Scenario Outline: Test map status logic for Project, MP and Device(MP.Sensor) at project level
     Given There is a project called aaa-'<testCase>'
     And I navigate to project 'overview'
@@ -26,7 +26,7 @@ Feature: Status
     # tests that status logic is implemented in IN Client
   #  SSD-2589
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Test aside status logic for MP and Device(MP.Sensor) at project level
     Given There is a project called aaa-'<testCase>'
     And I navigate to project 'overview'
@@ -42,7 +42,7 @@ Feature: Status
 
 # tests that status logic is implemented in IN Client
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario Outline: Test map- and list status logic for Project at account level
     Given There is a project called aaa-'<testCase>'
     When I look for the project
@@ -59,7 +59,7 @@ Feature: Status
 
 #    tests that the changed activity state is rendered in GUI
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Level - Make Project inactive from map
     Given There is a project called aaa-'all_ok'
     And I am in account 'projects'
@@ -69,7 +69,7 @@ Feature: Status
 
 #    tests that the changed activity state is rendered in GUI
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Level - Make Project inactive from details view
     Given There is a project called aaa-'all_ok'
     When I set the project toggle to Inactive from project list
@@ -78,7 +78,7 @@ Feature: Status
 
 #    tests that the changed activity state is rendered in GUI
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project Level - Make Measuring Point inactive from details view
     Given There is a project called aaa-'all_ok'
     When I set the mp toggle to OFF from mp detail panel
@@ -87,7 +87,7 @@ Feature: Status
 
   #    SSD-3154, -3252
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify no empty labels
     Given there is a message rule with all labels 'OFF'
     And C22 are ready to trigger

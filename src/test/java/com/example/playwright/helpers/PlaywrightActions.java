@@ -147,7 +147,9 @@ public class PlaywrightActions {
 
     // todo: missvisande namn?
     public List<String> findManyElementsAttribute(String path, String attributeName) {
-        Locator elements = page.locator(path).first();
+        System.out.println("\nTrying to find values of attribute '" + attributeName + "' in '" + path + "'");
+        // In case elements are not found as expected, this could perhaps be solved by page.waitForLoadState(LoadState.NETWORKIDLE); instead of static sleep.
+        Locator elements = page.locator(path);
 
         return elements.all()
                 .stream()
@@ -166,8 +168,8 @@ public class PlaywrightActions {
 
     public final boolean elementExistAndVisible(final String path, boolean failTestIfNotFound, int timeoutSeconds) {
         System.out.println("\nTrying to assert if '" + path + "' is visible.");
+
         int waitTimeMillis = (timeoutSeconds == 0)
-//                ? 100
                 ? 50
                 : timeoutSeconds * 1000;
 

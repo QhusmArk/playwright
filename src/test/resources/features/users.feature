@@ -4,7 +4,7 @@ Feature: Users
 
   @automation
 #  @manualLoginWithAdmin
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Change user first name
     When I open UserProfile
     And I try to edit my first name
@@ -14,7 +14,7 @@ Feature: Users
   @noUpgEnv
   @automation
 #  @manualLoginWithAdmin
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Change user language
     When I open UserProfile
     And I choose a different language
@@ -25,7 +25,7 @@ Feature: Users
 # SSD-2036, -4223, -2035
   @noUpgEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Calendar language should depend on users settings
     When user language is 'English'
     Then week starts with 'Sun'
@@ -41,7 +41,7 @@ Feature: Users
     And user language is 'English'
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify default headers for account Users
     When I am in account 'users'
     And aside is 'FULL'
@@ -53,7 +53,7 @@ Feature: Users
     And no other headers can be selected
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify default headers for project Users
     Given there is a project with a client
     And I am in project 'users'
@@ -67,7 +67,7 @@ Feature: Users
 
 # SSD-2767, SSD-2957
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate toggle in settings for subUsers
     Given there is a project with a client
     And I am in the clients settings page
@@ -78,14 +78,14 @@ Feature: Users
 
   #  SSD-2841
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate email requirement when creating user
     When I create a user without email
     Then notify message 'Some values are invalid, please correct them first!' is displayed
 
         # SSD-2798
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account level - Create and delete a user with email sent
     Given I am at account 'users create'
     When I create a user with email sent
@@ -95,7 +95,7 @@ Feature: Users
 
   # SSD-2798
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account level - Create and delete a user without email sent
     Given I am at account 'users create'
     When I create a user without email sent
@@ -103,7 +103,7 @@ Feature: Users
 
   # SSD-3030
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project level - User creation and redirection
     Given there is a project
     And I am at project 'users manage'
@@ -117,7 +117,7 @@ Feature: Users
 
     #   SSD-3274
   @automation
-  @setUpSeleniumWithUser
+  @loginWithUser
   Scenario: User are only permitted to create subUsers
     When I navigate to account 'users create'
     Then dropdown contains 'role'
@@ -125,7 +125,7 @@ Feature: Users
 
     #  SSD-3272
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Supported languages
     Given I navigate to account 'users create'
     Then dropdown contains 'language'
@@ -135,7 +135,7 @@ Feature: Users
 
     # SSD-3033
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Users create panel contains message rules list
     Given there is a project with an inactive message rule
     When I am at project 'users create'

@@ -39,7 +39,7 @@ public class TestDataBuilder {
 
     private final String directory;
     private List<String> files;
-    private Context context;
+    private final Context context;
 
     /**
      * This variable is used in almost all methods and is therefore allowed to be defined here.

@@ -695,6 +695,8 @@ public class DataReportGlue extends BaseGlue {
 
     @And("I am redirected to a new temporary data report")
     public void iAmRedirectedToANewTemporaryDataReport() {
+        Navigate.refreshBrowser();
+
         String searchId = Navigate.getSearchIdFromUrl();
         Search search = SearchApi.getSearch(context().getProject().getId(), searchId);
 

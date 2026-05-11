@@ -3,7 +3,7 @@
 Feature: Measuring Points CRUD
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Create a measuring point in the client
     Given there is a project
     And I navigate to project 'overview'
@@ -12,7 +12,7 @@ Feature: Measuring Points CRUD
     And The measuring point should be visible on the map
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Edit and delete a measuring point
     Given there is a project with a measuring point
     When I navigate to project measuring point 'settings general'
@@ -22,7 +22,7 @@ Feature: Measuring Points CRUD
   # SSD-2019, SSD-3000
   @noStageEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Mp-price can be set on measuring point on creation
     Given there is a project
     When I navigate to project measuring point 'create'
@@ -32,7 +32,7 @@ Feature: Measuring Points CRUD
 
   # SSD-2417
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Go-to-device button at MP Connected device view
     Given there is a project with several measuring points
     And I click on Go to device
@@ -40,7 +40,7 @@ Feature: Measuring Points CRUD
 
     # SSD-2434
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Testing Mp menu - Measuring point settings
     Given there is a project with a S50
     And I navigate to project 'measuring points'
@@ -50,7 +50,7 @@ Feature: Measuring Points CRUD
 
   # SSD-2434
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Testing Mp menu - Center map on measuring point
     Given there is a project with a S50
     And I navigate to project 'measuring points'
@@ -59,7 +59,7 @@ Feature: Measuring Points CRUD
 
   # SSD-2446
   @automation
-  @setUpSeleniumWithClient
+  @loginWithClient
   Scenario: Don’t show create mp link for clients
     Given there is a project with a client
     And I am in project 'measuring points'
@@ -67,7 +67,7 @@ Feature: Measuring Points CRUD
 
   # SSD-2306
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Devices should be searchable if tab is used to get to input field
     Given there is a project
     And I navigate to project 'overview'
@@ -77,7 +77,7 @@ Feature: Measuring Points CRUD
 
   # SSD-2545
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Changed redirect after MP create
     Given there is a project
     And I navigate to project measuring point 'create'
@@ -87,7 +87,7 @@ Feature: Measuring Points CRUD
 
   # SSD-2645, SSD-2960
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Create a data report from measuring point menu
     Given there is a project with a measuring point
     When I navigate to project 'measuring points'
@@ -99,7 +99,7 @@ Feature: Measuring Points CRUD
 
   #    SSD-2992 Bulk action, MP
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Bulk actions - project mp - Validate Edit Time Frame default options
     Given there is a project with several measuring points
     And I navigate to project 'measuring points'
@@ -108,7 +108,7 @@ Feature: Measuring Points CRUD
 
   #    SSD-2992 Bulk action, MP
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Mp Bulk actions - Change mp date by Edit Time Frame
     Given there is a project with several measuring points
     And I navigate to project 'measuring points'
@@ -119,7 +119,7 @@ Feature: Measuring Points CRUD
 
     #  SSD-3020
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate new measuring point get now time
     Given there is a project
     And I navigate to project measuring point 'create'
@@ -127,7 +127,7 @@ Feature: Measuring Points CRUD
 
     # SSD-3116
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Bulk action - create data report from measuring point list
     Given there is a project with a C22 and interval report
     And I am in project 'measuring points'
@@ -140,7 +140,7 @@ Feature: Measuring Points CRUD
 
       #  SSD-3278
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Map marker - new location by input of coordinates
     Given there is a project with a measuring point
     And I navigate to project 'measuring points'
@@ -150,7 +150,7 @@ Feature: Measuring Points CRUD
 
         #  SSD-3278
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Map marker - new location by input
     Given there is a project with a measuring point
     And I am at measuring point 'coordinates'
@@ -159,7 +159,7 @@ Feature: Measuring Points CRUD
 
     #  SSD-3278, refactor to Map.feature?
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Map marker - new location by Pin_on_map
     Given there is a project with a measuring point
     And I am at measuring point 'coordinates'
@@ -176,7 +176,7 @@ Feature: Measuring Points CRUD
 
     #SSD-3361
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Active channels list
     Given a C50 report with custom_Ln and dBCorr
     When I navigate to project measuring point 'active channels'

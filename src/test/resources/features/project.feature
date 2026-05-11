@@ -4,14 +4,14 @@ Feature: Project CRUD
 
   @noUpgEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Create a project from the client
     When A project is created
     And I am in account 'projects'
     Then the project should be visible in aside
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify default headers for account Projects
     Given I am in account 'projects'
     When aside is 'FULL'
@@ -24,7 +24,7 @@ Feature: Project CRUD
 
   # SSD-3126
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Change project description
     Given there is a project
     And I am at project 'settings'
@@ -32,7 +32,7 @@ Feature: Project CRUD
     Then the new project description will be visible in settings panel
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Write a comment in a project
     Given there is a project
     And I navigate to project 'overview'
@@ -41,7 +41,7 @@ Feature: Project CRUD
 
   #  SSD-2275
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Added or removed comment should impact Comment list and panel at once
     Given there is a project with a comment
     And I navigate to project 'overview'
@@ -51,7 +51,7 @@ Feature: Project CRUD
 
     #  SSD-2293
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: No redirect after user is removed from project
     Given there is a project with a user connected to the project
     When I remove the project from the user
@@ -60,14 +60,14 @@ Feature: Project CRUD
     #    SSD-2401
   @noUpgEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Selected location search hit places marker on map
     When user has selected a search result in Find location
     Then a large pin should appear on the map
 
 # SSD-2862
   @automation
-  @setUpSeleniumWithClient
+  @loginWithClient
   Scenario: SubUser should not see create project plus button
     When I am in account 'overview'
     Then I shall not be able to see Create project button
@@ -75,7 +75,7 @@ Feature: Project CRUD
   #  SSD-2985
   @noUpgEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project creation logic - account overview - non-unique name and projectID
     Given there is a project
     When I start creating a project from account overview
@@ -85,7 +85,7 @@ Feature: Project CRUD
   #  SSD-2985
   @noUpgEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project creation logic - account overview - unique project name, non-unique id
     Given there is a project
     When I start creating a project from account overview
@@ -94,7 +94,7 @@ Feature: Project CRUD
 
   #  SSD-2985
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   @noUpgEnv
   Scenario: Project creation logic - bulk action - non-unique name and projectID
     Given there is a project
@@ -106,7 +106,7 @@ Feature: Project CRUD
 
   #  SSD-2985
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   @noUpgEnv
   Scenario: Project creation logic - bulk action - unique project name, non-unique id
     Given there is a project
@@ -118,7 +118,7 @@ Feature: Project CRUD
 
     #    SSD-2914 Bulk action, Project
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Bulk action - account devices - create project
     Given I am in account 'devices'
     And I select these and make 'Create project' bulk action
@@ -131,7 +131,7 @@ Feature: Project CRUD
 
   # SSD-2197
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Change project name
     Given there is a project
     And I am at project 'settings'
@@ -141,7 +141,7 @@ Feature: Project CRUD
 
     #  SSD-3952
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Project time in project timezone
     Given a project in Istanbul timezone
     When I am in account 'projects'

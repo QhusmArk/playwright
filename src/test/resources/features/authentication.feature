@@ -1,6 +1,6 @@
 # language: en
 
-#  If @setUpSeleniumWithAdmin is not included its because no Context is prereq.
+#  If @loginWithAdmin is not included its because no Context is prereq.
 #  If# @deleteProject is not included its because no Context was required.
 
 Feature: Authentication

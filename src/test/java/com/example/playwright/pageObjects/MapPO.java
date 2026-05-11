@@ -3,10 +3,14 @@ package com.example.playwright.pageObjects;
 import com.example.api.models.project.Project;
 import com.example.helpers.StatusAssesser.Status;
 import com.example.playwright.components.map.MainPane;
+import com.example.playwright.components.parts.Button;
+import com.example.playwright.components.parts.Icon;
 import com.example.playwright.components.parts.LocationFloatingPanel;
 import com.example.playwright.helpers.PlaywrightActions;
+import com.example.playwright.helpers.enums.IconType;
 import com.microsoft.playwright.options.BoundingBox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.helpers.StatusAssesser.Status.*;
@@ -180,15 +184,51 @@ public class MapPO extends CommonPO {
             mainPane.setButtonInRightBottomCorner(className, buttonText);
         }
 
-        // Get all map markers
-//        List<String> visibleMapMarkers = actions().findAllVisibleElementsAttribute("//main //div[@class='leaflet-pane leaflet-marker-pane leaflet-zoom-hide'] //img", "src");
-        List<String> visibleMapMarkers = actions().findManyElementsAttribute("//main //div[@class='leaflet-pane leaflet-marker-pane leaflet-zoom-hide'] //img", "src");
+        boolean hasMapMarker = actions().elementExistAndVisible("//main //div[@class='leaflet-pane leaflet-marker-pane leaflet-zoom-hide'] //img", false);
+        if (hasMapMarker) {
+            List<Button> mapMarkerButtons = new ArrayList<>();
 
-        visibleMapMarkers.forEach(mainPane::setMapIcon);
+            // The map markers takes a sec or two to load to map
+            PlaywrightActions.sleep(1);
+
+            // Get all map markers
+            int mapMarkerCount = actions().countHowManyVisibleElements("//main //div[@class='leaflet-pane leaflet-marker-pane leaflet-zoom-hide'] //img");
+
+            for (int i = 1; i <= mapMarkerCount; i++) {
+                String mapMarkerPath = "(//main //div[@class='leaflet-pane leaflet-marker-pane leaflet-zoom-hide'] //img)["+i+"]";
+                Button mapMarkerButton = new Button();
+
+                Icon mapIcon = new Icon();
+                String mapMarkerSrc = actions().findOneElementsAttribute(mapMarkerPath, "src");
+                IconType mapMarkerType = IconType.fromClassName(getSvgName(mapMarkerSrc));
+                mapIcon.setType(mapMarkerType);
+                mapMarkerButton.setIcon(mapIcon);
+
+                // Grouped icons do not have title
+                if (!mapMarkerSrc.contains("group")) {
+                    String mapMarkerPopupText = actions().findOneElementsAttribute(mapMarkerPath, "title");
+                    mapMarkerButton.setText(mapMarkerPopupText);
+                }
+
+                mapMarkerButtons.add(mapMarkerButton);
+            }
+
+            mainPane.setMapMarkerButtons(mapMarkerButtons);
+        }
 
         return mainPane;
     }
 
+    private static String getSvgName(String mapMarkerSrc) {
+        int start = mapMarkerSrc.lastIndexOf('/') + 1;
+        int end = mapMarkerSrc.lastIndexOf(".svg");
+
+        if (end == -1 || end <= start) {
+            return "";
+        }
+
+        return mapMarkerSrc.substring(start, end);
+    }
 
 
 }

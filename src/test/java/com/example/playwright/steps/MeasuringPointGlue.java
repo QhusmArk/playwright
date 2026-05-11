@@ -4,9 +4,11 @@ import com.example.api.endpoints.MeasuringPointApi;
 import com.example.api.models.agenda.Label;
 import com.example.api.models.measuringpoint.MeasuringPoint;
 import com.example.helpers.AssertionHelpers;
+import com.example.helpers.JsonUtil;
 import com.example.helpers.Randomizer;
 import com.example.helpers.TimeConverter;
 import com.example.playwright.components.aside.asideItems.listItems.MeasuringPointItem;
+import com.example.playwright.components.map.MainPane;
 import com.example.playwright.components.panels.MeasuringPointSettingsActiveChannelsPanel;
 import com.example.playwright.components.panels.measuringPoint.MeasuringPointDetailsPanel;
 import com.example.playwright.components.panels.user.MeasuringPointVibrationReportSettingsPanel;
@@ -56,8 +58,16 @@ public class MeasuringPointGlue extends BaseGlue {
     public void visibleOnMap() {
         // Get the newly created MP
         MeasuringPoint measuringPoint = context().getMeasuringPoints().getFirst();
+//        assertTrue(mpPO.existOnMap(measuringPoint.getName()));
 
-        assertTrue(mpPO.existOnMap(measuringPoint.getName()));
+        MainPane mainPane = mapPO.getMainPane();
+        JsonUtil.createJsonAndSave(mainPane);
+
+        mainPane.getMapMarkerButtons().stream()
+                .filter(button -> button.getText().equals(measuringPoint.getName()))
+                .findAny()
+                .orElseThrow(
+                        () -> new IllegalStateException("No map marker for " + measuringPoint.getName()));
     }
 
     @And("The measuring point should be visible in the list")
@@ -80,6 +90,7 @@ public class MeasuringPointGlue extends BaseGlue {
         // Add the new mp to context
         MeasuringPoint measuringPoint = MeasuringPointApi.getMeasuringPoints(context().getProject().getId()).getFirst();
         context().addMeasuringPoint(measuringPoint);
+        Navigate.refreshBrowser();
     }
 
     @And("I create a Measuring Point using {string}, {string} and {string}")
@@ -296,7 +307,10 @@ public class MeasuringPointGlue extends BaseGlue {
 
     @Then("Mp price is {string}")
     public void mpPriceIs(String expectedMpPrice) {
-        String actualMpPrice = mpPO.getMeasuringPointSettingsGeneralPanel().getGeneralSettings().getInputField("Price").getText();
+        String actualMpPrice = mpPO.getMeasuringPointSettingsGeneralPanel()
+                .getGeneralSettings()
+                .getInputField("Price")
+                .getText();
 
         assertEquals(expectedMpPrice, actualMpPrice, "Actual mp price of '"+actualMpPrice+"' was not " + expectedMpPrice);
     }

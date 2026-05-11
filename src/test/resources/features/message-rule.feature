@@ -3,14 +3,14 @@
 Feature: Message Rules CRUD
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Create a message rule
     Given there is a project with two measuring points and two blasts
     When I create a message rule
     Then I see the new message rule in aside
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Edit and delete a message rule
     Given there is a project with a message rule
     When I am at project message rule 'settings general'
@@ -18,7 +18,7 @@ Feature: Message Rules CRUD
     And I can delete the message rule
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify default headers for project message rules
     Given there is a project with a message rule
     And I am in project 'message_rules'
@@ -32,14 +32,14 @@ Feature: Message Rules CRUD
 
   #    SSD-2301
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Message Rule with absolute values on MP with C50
     Given there is a project with a C50
     Then I can create a message rule with absolute value
 
   # SSD-3021, SSD-3130
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify show projects user toggle
     Given there is a maxed out project
     And I am at project message rules settings 'recipients'
@@ -49,7 +49,7 @@ Feature: Message Rules CRUD
 
   #  SSD-3153
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate V10 and Guide Value label
     Given there is a guide value project
     And C22 are ready to trigger
@@ -58,7 +58,7 @@ Feature: Message Rules CRUD
 
   #  SSD-3154, -3153
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify labels in GUI and SMS
     Given there is a message rule with all labels 'ON'
     And C22 are ready to trigger
@@ -68,7 +68,7 @@ Feature: Message Rules CRUD
 
     #    SSD-3539
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Display mp description in message rule
     Given there is a project with several measuring points
     When I navigate to project message rules 'create'
@@ -76,7 +76,7 @@ Feature: Message Rules CRUD
 
       # SSD-4015
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Create - Validate only vib sensors for TRANS MR
     Given a project with vib and noise
     And I navigate to project message rules 'create'
@@ -85,7 +85,7 @@ Feature: Message Rules CRUD
 
     #  SSD-4158
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Creation of user and adding to existing message_rule
     Given a project with a message rule with recipient
     When I navigate to project 'users create'

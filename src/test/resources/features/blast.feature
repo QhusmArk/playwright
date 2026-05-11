@@ -12,28 +12,28 @@ Feature: Blast
 #  No grouping of Blasts shall occur.
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Create a blast in a project
     Given there is a project
     When I am at project blast 'create'
     Then I can create a blast
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Copy a blast event in a project
     Given There is a project with a blast
     When I am at project blast 'create'
     Then I can copy a blast
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Search for a blast event in a project
     Given there is a project with two measuring points and two blasts
     When I navigate to project 'blasts'
     Then blast 'Blast_two' can be found in aside
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Edit and delete a blast
     Given There is a project with a blast
     When I am at project blast 'settings general'
@@ -41,7 +41,7 @@ Feature: Blast
     And I can delete the blast
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Verify default headers for project blasts
     Given there is a project with two measuring points and two blasts
     And I am in project 'blasts'
@@ -55,7 +55,7 @@ Feature: Blast
 
     # SSD-2446
   @automation
-  @setUpSeleniumWithBlaster
+  @loginWithBlaster
   Scenario: Show create blast link for blasters
     Given there is a project with a blaster
     When I am in project 'blasts'
@@ -63,7 +63,7 @@ Feature: Blast
 
   #  SSD-2099
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate list item Blast
     Given there is a project with Blast Standard, blasts and saved interval report
     When I navigate to project 'blasts'

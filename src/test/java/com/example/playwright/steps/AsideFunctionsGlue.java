@@ -262,9 +262,7 @@ public class AsideFunctionsGlue extends BaseGlue {
     @And("listitem menu has these options")
     public void listitemMenuHasTheseOptions(DataTable table) {
         List<String> expectedMenuOptions = table.row(0);
-
         List<String> actualMenuOptions = asidePO.getMenuOptions();
-
         assertTrue(expectedMenuOptions.containsAll(actualMenuOptions));
     }
 
@@ -273,7 +271,6 @@ public class AsideFunctionsGlue extends BaseGlue {
         asidePO.clickOnTopListItemMenuAndSelect(menuSelection);
         PlaywrightActions.sleep(7);
     }
-
 
     @When("I click on Create MP from Aside Header")
     public void iClickOnCreateMPFromAsideHeaderPlus() {

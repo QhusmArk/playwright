@@ -57,10 +57,8 @@ public class NavigateGlue extends BaseGlue {
             default -> throw new IllegalStateException("Unexpected endpoint value: " + endpoint);
         }
     }
-    
 
 //    ***************************************************************************
-    
 
     @Then("I validate url contains {string}")
     public void iValidateUrlContainsOverview(String endpoint) {

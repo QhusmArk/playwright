@@ -6,7 +6,7 @@ Feature: Bug regression tests
 #   https://sigicom.atlassian.net/browse/SSD-2073
 #  The bug is not expected to be fixed as of Aug 27th 2025
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Mp without Guide Value has no data in Blast Journal
     Given there is a guide value project
     When 'blast journal' view is opened
@@ -20,7 +20,7 @@ Feature: Bug regression tests
 
 #  https://sigicom.atlassian.net/browse/SSD-3013
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Different aside icon status for Blast icon
     Given there is a project with two measuring points and two blasts
     And I am in project 'blasts'
@@ -31,7 +31,7 @@ Feature: Bug regression tests
 #    SSD-3185, Agenda list has this.project
 #  Merge with "Scenario: Copy agenda from other project - popup" when fixed
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Copy agenda list has current project
     Given there is a project with an Agenda and a client
     When I navigate to project 'overview'
@@ -42,14 +42,14 @@ Feature: Bug regression tests
 
 #    https://sigicom.atlassian.net/browse/SSD-2228, Usage not calculated correct
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Account Device Billing Report - October 31 day usage
     When I create an Account Device Billing Report by api
     Then Account Device Billing Report usage is '96.88 %'
 
 #    https://sigicom.atlassian.net/browse/SSD-2228, Usage not calculated correct
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Measuring Point Billing Report - October 31 day usage
     Given there is a project with a measuring point
     When I create a Project Measuring Points Billing Report by api

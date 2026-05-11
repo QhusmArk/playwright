@@ -3,7 +3,7 @@
 Feature: Data report details
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Open transient from Measuring point view
     Given there is a project with an interval report
     When 'measuring report' view is opened
@@ -12,7 +12,7 @@ Feature: Data report details
 
   # SSD-3029
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Open report and verify measuring points and transients
     Given there is a guide value project
     When 'intervals chart' view is opened
@@ -30,7 +30,7 @@ Feature: Data report details
 
   #  SSD-2234
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Interval report shows standards with letter appendix (1A or 1B)
     Given there is a project with mp that have measured with standard with letter appendix
     When 'intervals chart' view is opened
@@ -38,7 +38,7 @@ Feature: Data report details
 
   # SSD-2851
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: No resultant in TDA if unit has RMS
     Given there is a project with an all data report for std 59
     When 'transients' view is opened
@@ -46,7 +46,7 @@ Feature: Data report details
     Then the header has not 'Resultant'
 
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Frequency domain analysis - default operator
     Given there is a project with a 'C22' and transient report
     When 'transients' view is opened
@@ -60,7 +60,7 @@ Feature: Data report details
 
   # SSD-3029
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Validate transient table view parts
     Given there is a project with a 'V12' and transient report
     When 'transients' view is opened
@@ -68,7 +68,7 @@ Feature: Data report details
 
     #  SSD-2331
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Creator - first and last sample
     Given there is a project with a 'C22' and transient report
     And 'transients' view is opened
@@ -80,7 +80,7 @@ Feature: Data report details
 
   #  SSD-2331
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Legacy - first and last sample
     Given there is a project with a 'V12' and transient report
     And 'transients' view is opened
@@ -93,7 +93,7 @@ Feature: Data report details
   #  See comment in https://sigicom.atlassian.net/browse/SSD-2477
   @noProdEnv
   @automation
-  @setUpSeleniumWithAdmin
+  @loginWithAdmin
   Scenario: Open one transient of each sensor type
     Given a transient project
     Then it is possible to open a 'C22' transient

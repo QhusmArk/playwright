@@ -45,14 +45,15 @@ public class UserHooks extends BaseGlue {
         if (tags.contains("@blaster") || tags.contains("@loginWithBlaster")) {
             roles.add("BLASTER");
         }
+
         // Not ok to use more than one role per scenario
         if (roles.size() > 1) {
             throw new RuntimeException("Scenario has multiple role tags: " + tags);
+        } else if (roles.isEmpty()) {
+            throw new IllegalStateException("No role found for tag.");
+        } else {
+            return roles.getFirst();
         }
-
-        return roles.isEmpty()
-                ? null
-                : roles.getFirst();
     }
 
     @After
