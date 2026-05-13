@@ -9,11 +9,8 @@ import com.example.api.models.measuringpoint.MeasuringPoint;
 import com.example.api.models.message.MessageRule;
 import com.example.api.models.project.Project;
 import com.example.api.models.user.User;
-import com.example.helpers.AssertionHelpers;
-import com.example.helpers.DeviceAssesser;
-import com.example.helpers.StatusAssesser;
+import com.example.helpers.*;
 import com.example.helpers.StatusAssesser.Status;
-import com.example.helpers.TimeConverter;
 import com.example.playwright.components.aside.Aside;
 import com.example.playwright.components.aside.asideItems.listItems.*;
 import com.example.playwright.components.panels.TableColumnSettingsPanel;
@@ -39,8 +36,8 @@ import java.util.function.Predicate;
 import static com.example.helpers.StatusAssesser.Status.*;
 import static com.example.helpers.StatusAssesser.assessDeviceMonitoringStatus;
 import static com.example.helpers.StatusAssesser.assessProjectStatus;
+import static com.example.playwright.helpers.enums.AsideSize.COMPACT;
 import static com.example.playwright.helpers.enums.ColourSchema.POSITIVE;
-import static com.example.playwright.helpers.enums.DeviceType.COMPACT;
 import static com.example.playwright.helpers.enums.IconType.SETTINGS;
 import static com.example.playwright.helpers.enums.IconType.VIEW;
 import static com.example.playwright.helpers.enums.ProviderType.PROJECT;
@@ -457,7 +454,7 @@ public class AsideGlue extends BaseGlue {
 
     @Then("cogwheel is visible in {asideSize} {string}")
     public void cogwheelIsVisible(final AsideSize asideSize, final String expected) {
-        if (COMPACT.equals(asideSize)) {
+        if (asideSize.equals(COMPACT)) {
             Aside aside = asidePO.getAside(5, true);
 
             // Get the first listitem and check that the hover exposed the hidden settings icon
@@ -466,29 +463,12 @@ public class AsideGlue extends BaseGlue {
         } else {
             asidePO.setAsideSize(asideSize);
             Aside aside = asidePO.getAside(5);
-            System.out.println("aside row size: " + aside.getTable().getContent().size());
 
             // Assert that all device rows have a settings icon
             aside.getTable().getContent().forEach(deviceRow -> {
                 assertEquals(SETTINGS, deviceRow.getRowRightButton().getIcon().getType());
             });
         }
-    }
-
-    @Then("only communicating devices has a cogwheel")
-    public void onlyCommunicatingDevicesHasACogwheel() {
-        List<DeviceItem> devices = asidePO.getAside().getDeviceItems();
-
-        devices.forEach(deviceItem -> {
-            // Communicating devices should have cogwheel
-            if (deviceItem.getDeviceType().isCommunicatingDevice()) {
-                assertEquals(SETTINGS, deviceItem.getRightButton().getIcon().getType(),
-                        () -> "expectedIcon/actualIcon: " + SETTINGS + "/" + deviceItem.getRightButton().getIcon().getType());
-            } else { // Sensors like S50 should not have cogwheel
-                assertNull(deviceItem.getRightButton().getIcon().getType(),
-                        () -> "Non-communicator " + deviceItem.getSerial() + " should not have cogwheel.");
-            }
-        });
     }
 
     @And("no other headers can be selected")
@@ -544,9 +524,6 @@ public class AsideGlue extends BaseGlue {
                 .map(Button::getIcon)
                 .map(Icon::getType)
                 .toList();
-
-//        assertEquals(IconType.fromClassName("checkbox_" + expectedCheckbox), asideAction.getCheckbox().getType(),
-//                () -> "expected/actual: " + IconType.fromClassName(expectedCheckbox) + "/" + asideAction.getCheckbox().getType());
 
         Status expectedStatus = StatusAssesser.getCheckboxStatus(expectedCheckbox);
         assertEquals(expectedStatus, asideAction.getCheckbox().getStatus(),
@@ -629,11 +606,10 @@ public class AsideGlue extends BaseGlue {
         }
     }
 
-
     private static boolean validateTableRowSorting(Table.TableRow tableRow, List<Table.TableRow> deviceRows, String sortingOrder, String sortingOn) {
         // Copy list to avoid modifying the original list
         List<Table.TableRow> sortedList = new ArrayList<>(deviceRows);
-
+        JsonUtil.createJsonAndSave(sortedList);
         // Assume the list is not sorted and sort it the way we want
         switch (sortingOn) {
             case "Last read" -> // Sort the copied list based on the lastRead value parsed to minutes
@@ -689,9 +665,6 @@ public class AsideGlue extends BaseGlue {
      * If called with data from DeviceTable, then params can be empty.
      */
     private static int compareLastRead(String lastRead1, String lastRead2) {
-//        System.out.println("lastRead1: " + lastRead1);
-//        System.out.println("lastRead2: " + lastRead2);
-
         // COMPACT
         if (lastRead1 == null && lastRead2 == null) {
             return 0;   // If both are null, do not sort

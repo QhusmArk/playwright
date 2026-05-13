@@ -55,7 +55,8 @@ Feature: Agenda
   @automation
   @loginWithAdmin
   Scenario: Copy agenda from other project - success and fail
-    Given there is a project
+#    Given there is a project
+    Given there is a project without blast standard
     And I navigate to project 'agendas'
     When I click on 'Copy agenda' button
     And I try to copy an agenda

@@ -169,7 +169,7 @@ Feature: Measuring Points CRUD
 
       # SSD-2019
   @automation
-  @loginAsClient
+  @loginWithClient
   Scenario: SubUsers should not see project- or mp-price settings
     Given there is a project with an mp and a client
     Then neither project- nor mp price settings are available

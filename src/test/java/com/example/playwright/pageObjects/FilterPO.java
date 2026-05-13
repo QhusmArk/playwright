@@ -1,15 +1,12 @@
 package com.example.playwright.pageObjects;
 
-import com.example.helpers.StatusAssesser;
+import com.example.playwright.components.parts.Checkbox;
 import com.example.playwright.components.parts.FilterItem;
+import com.example.playwright.components.parts.Icon;
 import com.example.playwright.helpers.enums.FilterType;
-import com.example.playwright.helpers.enums.ProviderType;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.example.playwright.helpers.enums.ProviderType.DEVICE;
 
 public class FilterPO extends CommonPO {
 
@@ -33,11 +30,11 @@ public class FilterPO extends CommonPO {
      * Nb. This method do not take into consideration if a filter is blocking other filter options, e.g., 'Communicating devices' blocks 'S50'
      */
     public void changeFilter(String filterText) {
-        System.out.println("filterText: " + filterText);
+//        System.out.println("filterText: " + filterText);
         // Find out if filter menu will close automatically or if we have to do it.
         FilterType filterType = FilterType.fromText(filterText);
         boolean filterMenuWillCloseAfterInteraction = filterType.getAutocloseOnFilterInteraction();
-        System.out.println("filterMenuWillCloseAfterInteraction: " + filterMenuWillCloseAfterInteraction);
+//        System.out.println("filterMenuWillCloseAfterInteraction: " + filterMenuWillCloseAfterInteraction);
 
         openFilterMenu();
 
@@ -48,17 +45,11 @@ public class FilterPO extends CommonPO {
         }
 
         // Make sure filter menu is closed
-        boolean filterMenuIsOpen = actions().elementExistAndVisible("//div[@role='menu']");
-        System.out.println("filterMenuIsOpen: " + filterMenuIsOpen);
+        boolean filterMenuIsOpen = actions().elementExistAndVisible("//div[@role='menu']", false, 1);
+//        System.out.println("filterMenuIsOpen: " + filterMenuIsOpen);
         if (filterMenuIsOpen) {
             closeFilterMenu();
         }
-    }
-
-    public void setOnlyThisFilter(String filter) {
-        // filters 'Communicating devices' o/e 'Monitoring devices' bör inte vara aktiva
-        clearAllDeviceFilters();
-        changeFilter(filter);
     }
 
     /**
@@ -69,7 +60,7 @@ public class FilterPO extends CommonPO {
         String filterText = filterType.getText();
         boolean filterMenuWillCloseAfterInteraction = filterType.getAutocloseOnFilterInteraction();
 
-        System.out.println("filterText: " + filterText);
+//        System.out.println("filterText: " + filterText);
         openFilterMenu();
 
         selectFilter(filterText);
@@ -79,7 +70,6 @@ public class FilterPO extends CommonPO {
             closeFilterMenu();
         }
     }
-
 
     public void openFilterMenu() {
         actions().makeClick(LIST_HEADER_FILTER_BUTTON);
@@ -91,18 +81,8 @@ public class FilterPO extends CommonPO {
         actions().makeClick("//header");
     }
 
-    public int getAmountOfSelectedFiltersForDevice() {
-        openFilterMenu();
-
-        int filterCount = getDeviceFilterSelectedCounter();
-
-        closeFilterMenu();
-
-        return filterCount;
-    }
-
-    public int getFilterButtonNumber() {
-        return getTheNumberOnTheFilterButton();
+    public String getFilterButtonNumber() {
+        return actions().findOneElementsText(LIST_HEADER_FILTER_BUTTON);
     }
 
     public void resetDeviceFilters() {
@@ -113,55 +93,6 @@ public class FilterPO extends CommonPO {
         openFilterMenu();
         resetDeviceFilters();
         closeFilterMenu();
-    }
-
-    /**
-     * @return All active filters.
-     */
-//    public List<String> getActiveFilters() {
-//        String currentUrl = selenium.getCurrentUrl();
-//        ProviderType type = ProviderType.getProviderTypeFromCurrentUrl(currentUrl);
-//
-//        openFilterMenu();
-//
-//        List<String> activeFilters = new ArrayList<>();
-//
-//        // Get checked filters
-//        activeFilters.addAll(getCheckedFilters(type));
-//
-//        // Device has checkboxes that need fetching
-//        if (type.equals(DEVICE)) {
-//            activeFilters.addAll(getCheckboxedFilters());
-//        }
-//
-//        closeFilterMenu();
-//
-//        return activeFilters;
-//    }
-    // todo: denna returnerar nu alla filter, även header.
-    //
-    public List<String> getActiveFilters() {
-        // Get filters
-        List<FilterItem> filterItems = getAllFilters();
-
-        String currentUrl = actions().getCurrentUrl();
-        ProviderType type = ProviderType.getProviderTypeFromCurrentUrl(currentUrl);
-
-        // Remove the header row
-        filterItems.removeFirst();
-
-        if (type.equals(DEVICE)) {
-            return filterItems.stream()
-                    .filter(filterItem -> filterItem.getCheckbox() != null)
-                    .filter(filterItem -> filterItem.getCheckbox().getStatus().equals(StatusAssesser.Status.CHECKED))
-                    .map(FilterItem::getText)
-                    .toList();
-        } else {
-            return filterItems.stream()
-                    .filter(filterItem -> filterItem.getIcon() != null)
-                    .map(FilterItem::getText)
-                    .toList();
-        }
     }
 
     /**
@@ -178,36 +109,45 @@ public class FilterPO extends CommonPO {
         return filterItems;
     }
 
+    // todo: is Menu-component
+    public List<FilterItem> getAllMenuFilterItems() {
+        List<FilterItem> filterItems = new ArrayList<>();
 
-    /**
-     * @return All the filters that are checked or checkboxed.
-     */
-//    private List<String> getCheckedFilters(ProviderType type) {
-//        List<String> filterTexts;
-//        if (type.equals(DEVICE)) {
-//            filterTexts = actions().findManyElementsTexts(FILTER_LIST_NO_HEADER);
-//        } else {
-//            filterTexts = actions().findManyElementsTexts(FILTER_LIST);
-//        }
-//        return filterTexts.stream()
-//                .filter(filterText -> filterText.contains("done"))  // 'done' = checked filter
-//                .map(this::removeCounterFromFilterText)
-//                .map(this::removeDoneFromFilterText)
-//                .collect(Collectors.toList());
-//    }
+        String filtersPath = "//div[@role='menu'] //div[@role='listitem']";
 
-    /**
-     * @return checkboxed filters (device only)
-     */
-//    private List<String> getCheckboxedFilters() {
-//        return actions().findCheckboxedFilterText(FILTER_TICKED_CHECKBOXES);
-//    }
+        int filterRows =  actions().countHowManyElements(filtersPath);
 
-    /**
-     * @return The number of active filters in Device.filterButton
-     */
-    public int getTheNumberOnTheFilterButton() {
-        return Integer.parseInt(actions().findOneElementsText(LIST_HEADER_FILTER_BUTTON));
+        for (int row = 1; row <= filterRows; row++) {
+            String filterRowPath = "(" + "//div[@role='menu'] //div[@role='listitem'])[" + row + "]";
+
+            FilterItem filter = getFilterItem(filterRowPath);
+            filterItems.add(filter);
+        }
+
+        return filterItems;
+    }
+
+    private FilterItem getFilterItem(String filterRowPath) {
+        FilterItem filter = new FilterItem();
+
+        // First check for check-icon, those are more common
+        boolean hasIcon = actions().elementExistAndVisible(filterRowPath + "//i", false, 0);
+        if (hasIcon) {
+            Icon icon = getIcon(filterRowPath + "//i");
+            filter.setIcon(icon);
+        } else {
+            boolean hasCheckbox = actions().elementExistAndVisible(filterRowPath + "//div[@role='checkbox']", false, 0);
+            if (hasCheckbox) {
+                Checkbox checkbox = getCheckbox(filterRowPath + "//div[@role='checkbox']");
+                filter.setCheckbox(checkbox);
+            }
+        }
+
+        // Text
+        String text = actions().findOneElementsText(filterRowPath + " //div[contains(@class, 'text-body')]");
+        filter.setText(text);
+
+        return filter;
     }
 
     /**
@@ -216,42 +156,7 @@ public class FilterPO extends CommonPO {
      */
     public void selectFilter(String filterText) {
         System.out.println("***************** Selecting filter **********************");
-        String by = "//div[@role='menu'] //*[contains(text(), '" + filterText + "')]";
-        actions().makeClick(by);
-    }
-
-    /**
-     * Some listItems contain a 'counter' in the end, eg. 'Communication (4)'.
-     * @return 'Communication' if input is 'Communication (4)'
-     */
-    private String removeCounterFromFilterText(String listItemText) {
-        Pattern pattern = Pattern.compile("\\(.*?\\)");
-        Matcher matcher = pattern.matcher(listItemText);
-        if (matcher.find()) {
-            return matcher.replaceAll("").trim();
-        } else {
-            return listItemText;
-        }
-    }
-
-    /**
-     * Checked filters have text 'done' + new line + filter text.
-     * @return Filter text as the user sees it.
-     */
-    private String removeDoneFromFilterText(String input) {
-        return input.replace("done\n", "");
-    }
-
-    /**
-     * Device top row listItem is a non-clickable active filter counter.
-     * @return The digit in the row showing how many active filters that are employed.
-     */
-    public int getDeviceFilterSelectedCounter() {
-        String headerText = actions().findOneElementsText(FILTER_DEVICE_HEADER);
-        System.out.println("headerText: " + headerText);
-
-        // Return the number from the 'selected'-row
-        return getCountFromSelected(headerText);
+        actions().makeClick("//div[@role='menu'] //*[contains(text(), '" + filterText + "')]");
     }
 
     /**
@@ -260,19 +165,6 @@ public class FilterPO extends CommonPO {
      */
     private void clearAllFilters() {
         actions().makeClick(SELECTED_FILTER_CLEAR);
-    }
-
-    /**
-     * Gets the int from eg "3 selected"
-     * @return the digit, ie the number of filters
-     */
-    private int getCountFromSelected(String selectedText) {
-        if (selectedText.equals("Filter")) {    // If "Filter" then no filters are applied
-            return 0;
-        } else {
-            String[] parts = selectedText.split(" "); // Split the string around the space
-            return Integer.parseInt(parts[0]); // Parse the first part (the digit/s) into an int
-        }
     }
 
     public boolean selectColumnsButtonExist() {

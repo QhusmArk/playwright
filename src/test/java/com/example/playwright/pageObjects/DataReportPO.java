@@ -491,8 +491,8 @@ public class DataReportPO extends CommonPO {
             String headerRowPath = tablePath + "/thead/tr[1]/th["+c+"]";
 
             String headerText = actions().findOneElementsText(headerRowPath);
-            if (headerText.contains("\narrow_upward")) {
-                headerText = headerText.replace("\narrow_upward", "");
+            if (headerText.contains("arrow_upward")) {
+                headerText = headerText.replace("arrow_upward", "");
             }
             headerRow.addContent(headerText);
         }
@@ -500,46 +500,6 @@ public class DataReportPO extends CommonPO {
         return headerRow;
     }
 
-//    private List<Table.TableRow> getMeasuringReportTransientRows(String tablePath, int columns) {
-//        List<Table.TableRow> transientRows = new ArrayList<>();
-//
-//        int rowCount = actions().countHowManyElements(tablePath + "/tbody[@class='q-virtual-scroll__content']/tr");
-//
-//        // todo: dynamic DOM... :-( ?
-//        for (int r = 1; r <= rowCount; r++) {
-//            Table.TableRow transientRow = new Table.TableRow();
-//
-//            String rowPath = tablePath + "/tbody[@class='q-virtual-scroll__content']/tr["+r+"]";
-//
-//            for (int c = 1; c <= columns; c++) {
-//                Table.TableCell tableCell = new Table.TableCell();
-//
-//                String cellPath = rowPath + "/td["+c+"]";
-//
-//                if (c == 1 || c == 10) {
-//                    Icon mpIcon = completeGetIcon(cellPath + "/div");
-//                    tableCell.addCellIcon(mpIcon);
-//
-//                    String text = actions().findOneElementsText(cellPath + "/div/span");
-//                    tableCell.addCellText(text);
-//
-//                } else if (c == 4) {
-//                    List<String> channelValues = actions().findManyElementsTexts(cellPath + "/div/div");
-//                    tableCell.setCellTexts(channelValues);
-//
-//                } else {
-//                    String text = actions().findOneElementsText(cellPath);
-//                    tableCell.addCellText(text);
-//
-//
-//                }
-//                transientRow.addContent(tableCell);
-//
-//            }
-//            transientRows.add(transientRow);
-//        }
-//        return transientRows;
-//    }
     private List<Table.TableRow> getMeasuringReportTransientRows(String tablePath, int columns) {
         List<Table.TableRow> transientRows = new ArrayList<>();
 

@@ -1,8 +1,8 @@
 package com.example.api;
 
 import com.example.playwright.config.TestEnvironment;
-import com.example.playwright.config.TestUserLoader;
 import com.example.playwright.hooks.testUsers.TestUser;
+import com.example.playwright.hooks.testUsers.TestUserPool;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.parsing.Parser;
@@ -27,8 +27,11 @@ public class RequestService {
      * Always uses admin credentials to gain access to api
      */
     private static Map<String, String> getAdminCredentials(final String api) {
-        TestUser apiAdmin = TestUserLoader.createApiUser();
-
+        TestUser apiAdmin = TestUserPool.getCurrentUser();
+        if (!apiAdmin.role().equals("ADMIN")) {
+            throw new IllegalStateException("Only ADMIN roles can access this API for this purpose.");
+        }
+        
         Map<String, String> map = new HashMap<>();
         if (api.startsWith("v0") || api.startsWith("v1")) {
             map.put("user", "user:" + apiAdmin.id());   // "user:XXXX"

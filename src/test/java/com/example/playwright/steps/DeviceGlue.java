@@ -610,7 +610,7 @@ public class DeviceGlue extends BaseGlue {
                     .details()
                     .get();
 
-            DeviceDetailsPanel deviceDetailsPanel = ddPO.getDeviceDetailsPanel(type.getType());
+//            DeviceDetailsPanel deviceDetailsPanel = ddPO.getDeviceDetailsPanel(type.getType());
         });
 
     }
@@ -822,7 +822,6 @@ public class DeviceGlue extends BaseGlue {
         filterPO.changeFilter("S50");    // To avoid finding the S50's logger
         asidePO.makeSearchInAside(DeviceProperties.getConnectedSerial("S50"));
 
-//        Aside aside = asidePO.getAside();
         Aside aside = asidePO.getAside(10);
 
         Table.TableRow s50row = aside.getTable().getContent().getFirst();
@@ -839,7 +838,6 @@ public class DeviceGlue extends BaseGlue {
         // Check that a (supposed) active logger now has fw version
         asidePO.makeSearchInAside(DeviceProperties.getConnectedSerial("D10"));
 
-//        Aside aside = asidePO.getAside();
         Aside aside = asidePO.getAside(10);
 
         Table.TableRow d10row = aside.getTable().getContent().getFirst();
@@ -1082,6 +1080,7 @@ public class DeviceGlue extends BaseGlue {
      */
     @Then("aside menu show {string} change")
     public void asideMenuShowChange(String scenario) {
+        PlaywrightActions.sleep(3);
         // As we're interested in Aside Menu, lets not waste time in getting all DeviceItems
         Aside aside = asidePO.getAside(1);
 
@@ -1103,7 +1102,9 @@ public class DeviceGlue extends BaseGlue {
      * @return "X uncommitted change"
      */
     private String deductExpectedNoticeText() {
-        long count = DeviceApi.getDevices().stream()
+        List<Device> allDevices = DeviceApi.getDevices();
+
+        long count = allDevices.stream()
                 .filter(device -> device.getChange() != null)
                 .filter(device -> "uncommitted".equals(device.getChange().getState()))
                 .count();
@@ -1111,8 +1112,8 @@ public class DeviceGlue extends BaseGlue {
         return (count == 0)
                 ? null
                 : (count == 1)
-                ? count + " uncommitted change"
-                : count + " uncommitted changes";
+                    ? count + " uncommitted change"
+                    : count + " uncommitted changes";
     }
 
     @Then("{string} list item show {string} change")

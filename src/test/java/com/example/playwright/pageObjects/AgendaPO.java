@@ -150,7 +150,8 @@ public class AgendaPO extends CommonPO {
         // Make the dropdown expand
         actions().makeClick(dropDownControllerPath);
 
-        actions().makeJavaScriptClick("//div[@role='listbox'] //div[@data-qa-id='"+value+"']/ancestor::div[@role='option']");
+//        actions().makeJavaScriptClick("//div[@role='listbox'] //div[@data-qa-id='"+value+"']/ancestor::div[@role='option']");
+        actions().makeClick("//div[@role='listbox'] //div[@data-qa-id='"+value+"']/ancestor::div[@role='option']");
     }
 
     /**
@@ -224,7 +225,7 @@ public class AgendaPO extends CommonPO {
     private FieldWrapper getTimeslotFieldWrapper() {
         FieldWrapper timeslotWrapper = getFieldWrapperCommonPartsByHeader("Time slot");
 
-        InputField inputField = getInputFieldByPath("//form //label");
+        InputField inputField = getInputFieldByPath("(//form //label)[1]");
         timeslotWrapper.addContent(inputField);
 
         Dropdown fromTime = getDropdownByName("From *");
@@ -403,7 +404,7 @@ public class AgendaPO extends CommonPO {
         String headerPath = tablePath + "/thead";
 
         String nameColumn = actions().findOneElementsText(headerPath + "/tr/th[2]")
-                .replace("\narrow_upward", "");
+                .replace("arrow_upward", "");
         header.addContent(nameColumn);
         header.addContent(actions().findOneElementsText(headerPath + "/tr/th[3]"));
         table.setHeader(header);

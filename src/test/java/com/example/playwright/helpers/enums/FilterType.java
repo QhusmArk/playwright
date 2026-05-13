@@ -90,6 +90,7 @@ public enum FilterType {
     public String getText() {
         return text;
     }
+
     public boolean getAutocloseOnFilterInteraction() { return autocloseOnFilterInteraction; }
 
     public static FilterType fromText(String text) {

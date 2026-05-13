@@ -364,8 +364,11 @@ public abstract class CommonPO {
         actions().makeClick("//form //button //span[contains(text(), 'Create user')]");
     }
 
+//    public void clickOnButton(String buttonToClick) {
+//        actions().makeClick("//button //span[text()='"+buttonToClick+"']");
+//    }
     public void clickOnButton(String buttonToClick) {
-        actions().makeClick("//button //span[text()='"+buttonToClick+"']");
+        actions().makeClick("//button[.//span[text()='"+buttonToClick+"']]");
     }
 
     public boolean buttonPresent(String buttonText) {
@@ -792,7 +795,7 @@ public abstract class CommonPO {
 
         } else if (tabType.equals("data_report")) {
 
-            int divChildren = actions().countHowManyElements(tabPath + "/div");
+            int divChildren = actions().countElementChildren(tabPath,  "./div");       //ok
 
             if (divChildren == 2) { // I.e., a disabled tab
                 tabPath = tabPath.replace("*", "div");
@@ -1393,8 +1396,11 @@ public abstract class CommonPO {
         String mainText = actions().findOneElementsText(settingsItemPath + " //div[@class='q-item__label']");
         settingsItem.setMainText(mainText);
 
-        String subText = actions().findOneElementsText(settingsItemPath + " //div[@class='q-item__label q-item__label--caption text-caption']");
-        settingsItem.setSubText(subText);
+        boolean hasSubText = actions().elementExistAndVisible(settingsItemPath + " //div[@class='q-item__label q-item__label--caption text-caption']", false);
+        if (hasSubText) {
+            String subText = actions().findOneElementsText(settingsItemPath + " //div[@class='q-item__label q-item__label--caption text-caption']");
+            settingsItem.setSubText(subText);
+        }
 
         if (hasExpansionIcon) {
             Icon expansionIcon = completeGetIcon("(" + settingsItemPath + " //i)[2]/parent::div");
@@ -1638,6 +1644,16 @@ public abstract class CommonPO {
     }
 
     /**
+     * Checks if the string ends with "[{integer}]".
+     * Examples: "test[1]" = true, "abc[999]" = true, "abc[test]" = false.
+     */
+    public String addBracketIfNeeded(String path) {
+        return (path != null && path.matches(".*\\[\\d+]$"))
+                ? path
+                : "(" + path + ")[1]";
+    }
+
+    /**
      * @param buttonPath Last element in xpath have to be //button or //a.
      *                   //a is built like a button but has link to new page.
      */
@@ -1654,6 +1670,8 @@ public abstract class CommonPO {
 //        if (isHidden) {
 //            return null;
 //        }
+
+        buttonPath = addBracketIfNeeded(buttonPath);
 
         Button button = new Button();
 
@@ -1692,7 +1710,8 @@ public abstract class CommonPO {
             } else {
                 boolean hasTextInSecondSpan = actions().elementExistAndVisible(buttonPath + "/span[2]", false, 0);
                 if (hasTextInSecondSpan) {
-                    String text = actions().findOneElementsText(buttonPath + "/span[2]");
+                    // (//div[contains(@class,'side-panel')] //aside //button)[2]/span[2]
+                    String text = actions().findOneElementsText( buttonPath + "/span[2]");
                     if (!text.isEmpty()) {
                         button.setText(text);
                     }
@@ -2140,25 +2159,19 @@ public abstract class CommonPO {
 
         Checkbox checkbox = new Checkbox();
 
-//        Boolean isChecked = actions().findOneElementsAttribute(cellPath, "aria-checked").equals("true");
-//        checkbox.setIsChecked(isChecked);
-
         String ariaCheckedStatus = actions().findOneElementsAttribute(cellPath, "aria-checked");
         Status status =  StatusAssesser.getCheckboxStatus(ariaCheckedStatus);
 
         // An unchecked checkbox has aria-disabled only if it's class also contain 'disabled'
         if (status == Status.UNCHECKED) {
-//            boolean isDisabled = actions().findOneElementsAttribute(cellPath, "aria-disabled").equals("true");
-//            if (isDisabled) {
-//                status = Status.DISABLED;
-//            }
 
-            boolean isDisabled = actions().elementHasAttribute(cellPath, "aria-disabled");
-
-//            //div[@class='q-card']/div[2]/div[1]/div[1]/div[1]
-//            (//div[@role='checkbox' and @aria-disabled])[1]
-            if (isDisabled) {
-                status = Status.DISABLED;
+            // Is it possible for aria-disabled to be false?
+            boolean ariaDisabledAttributeExist = actions().elementExistAndVisible(cellPath + "[@aria-disabled]", false);
+            if (ariaDisabledAttributeExist) {
+                boolean isDisabled = actions().elementHasAttribute(cellPath, "aria-disabled");
+                if (isDisabled) {
+                    status = Status.DISABLED;
+                }
             }
         }
 
@@ -2224,8 +2237,8 @@ public abstract class CommonPO {
         String headerText = actions().findOneElementsText(headerCellPath);
 
         // Remove linebreak+icon-text manually as Selenium do not give us a way to avoid the <i>
-        if (headerText.contains("\narrow_upward")) {
-            headerText = headerText.replace("\narrow_upward", "");
+        if (headerText.contains("arrow_upward")) {
+            headerText = headerText.replace("arrow_upward", "");
         }
 
         headerCell.addCellText(headerText);
@@ -2362,47 +2375,6 @@ public abstract class CommonPO {
         actions().makeClick(itemPath);
     }
 
-    public List<FilterItem> getAllMenuFilterItems() {
-        List<FilterItem> filterItems = new ArrayList<>();
-
-        String filtersPath = "//div[@role='menu'] //div[@role='listitem']";
-
-        int filterRows =  actions().countHowManyElements(filtersPath);
-
-        for (int row = 1; row <= filterRows; row++) {
-            String filterRowPath = "(" + "//div[@role='listitem'])[" + row + "]";
-            
-            FilterItem filter = getFilterItem(filterRowPath);
-            filterItems.add(filter);
-        }
-        
-        return filterItems;
-    }
-
-    private FilterItem getFilterItem(String filterRowPath) {
-        FilterItem filter = new FilterItem();
-
-        // Null, icon or checkbox
-        boolean hasIcon = actions().elementExistAndVisible(filterRowPath + "//i", false, 0);
-        if (hasIcon) {
-            Icon icon = getIcon(filterRowPath + "//i");
-            filter.setIcon(icon);
-        }
-
-        boolean hasCheckbox = actions().elementExistAndVisible(filterRowPath + "//div[@role='checkbox']", false, 0);
-        if (hasCheckbox) {
-            Checkbox checkbox = getCheckbox(filterRowPath + "//div[@role='checkbox']");
-            filter.setCheckbox(checkbox);
-        }
-
-        // Text
-        String text = actions().findOneElementsText(filterRowPath);
-        filter.setText(text);
-
-        return filter;
-    }
-
-
     public Listbox getListbox() {
         Listbox listbox = new Listbox();
 
@@ -2528,7 +2500,7 @@ public abstract class CommonPO {
             case "discard", "add time slot"-> actions().makeClick("//span[text()='"+button+"']");
             case "remove" -> actions().makeClick("//div[@role='dialog'] //span[text()='Remove']");
 //            case "+ create user" -> clickCreateNewUserButton();
-//            case "copy agenda" -> clickOnButton(button);
+            case "copy agenda" -> clickOnButton(button);
             case "mon","tue","wed","thu","fri","sat","sun"  -> actions().makeClick("//*[text()='" + button + "']");
             default -> throw new IllegalArgumentException("Unexpected button: " + button);
         }
@@ -2541,9 +2513,9 @@ public abstract class CommonPO {
     public List<String> getToasts() {
         //Give time for more than "Creating temporary report" to show.
 
-        if (actions().elementExistAndVisible("//div[@class='q-notification__message col']", false)) {
+        if (actions().elementExistAndVisible("//div[@class='q-notification__message col']", false, 5)) {
             // Collect the messages into a list
-            return actions().findManyElementsTexts("//div[@class='q-notification__message col']");
+            return actions().findManyElementsTexts("//div[@class='q-notification__message col']", 5);
 
         } else {
             return new ArrayList<>();
@@ -2588,7 +2560,6 @@ public abstract class CommonPO {
 
         return buildIconForScenario(context, scenario);
     }
-
 
     /**
      * Holds all DOM facts used to determine and build the icon.

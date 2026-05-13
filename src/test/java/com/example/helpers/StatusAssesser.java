@@ -97,6 +97,7 @@ Expected:       Device            | ACTIVE        | NOT_PRESENT   | NOT_PRESENT 
         }
     }
 
+    // todo: Add UNCHECKED_DISABLED and perhaps CHECKED_DISABLED?
     public static Status getCheckboxStatus(String ariaCheckedAttribute) {
         return ariaCheckedAttribute.equals("true")
                 ? CHECKED

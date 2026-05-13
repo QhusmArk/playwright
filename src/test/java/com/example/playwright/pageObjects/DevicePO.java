@@ -416,7 +416,7 @@ public class DevicePO extends CommonPO {
                 msp.setCustomStatistics(customStatistics);
 
                 // Ln trigger value
-                InputField customStatisticsValue = completeGetInputField("//label[.//div[contains(text(),'Trigger value')]]");
+                InputField customStatisticsValue = completeGetInputField("(//label[.//div[contains(text(),'Trigger value')]])[1]");
                 msp.setCustomStatisticsValue(customStatisticsValue);
                 // Ln trigger state
                 ToggleField customStatisticsTrigger = completeGetToggleField("none", "//div[@data-qa-id='trigger_enable_Ln_trigger']/div");

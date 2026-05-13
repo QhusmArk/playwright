@@ -278,6 +278,7 @@ public class ApiChangeGlue extends BaseGlue {
                     throw new IllegalStateException(type + " blocked by user " + change.getUserId());
                 }
             }
+            // todo? Hur länge är det rimligt att vänta på att en device inte används?
 
             // Try again
             Change changeAfterDiscarding = DeviceApi.getChange(type, Integer.parseInt(serial));

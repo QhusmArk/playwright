@@ -41,7 +41,7 @@ Feature: Aside
     When I set these filters
       | Monitoring On | Low battery | C20 |
     Then These filters are active
-      | Communicating devices |Monitoring On | Low battery | C20 |
+      | Communicating devices | Monitoring On | Low battery | C20 |
     And That the device filters are '4' can be counted using
       | Filter size | Filter listItem counter | Filter button counter|
 

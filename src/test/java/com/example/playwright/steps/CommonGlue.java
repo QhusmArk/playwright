@@ -26,7 +26,7 @@ public class CommonGlue extends BaseGlue{
         }
 
         // Try go get all messages coming up from bottom of GUI
-        List<String> actualTexts = menuPO.getToasts();
+        List<String> toasts = menuPO.getToasts();
 
         // Translation logic for Swedish and French
         String expectedTextInSwedish = translateToSwedish(expectedTextInEnglish);
@@ -41,7 +41,7 @@ public class CommonGlue extends BaseGlue{
 
         // Loop through actual texts and check for a match
         boolean matchFound = false;
-        for (String actualText : actualTexts) {
+        for (String actualText : toasts) {
             if (actualText.contains(expectedTextInEnglish) ||
                     actualText.contains(expectedTextInSwedish) ||
                     actualText.contains(expectedTextInFrench)) {

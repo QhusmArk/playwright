@@ -99,6 +99,10 @@ public class DeviceProperties {
                 ? "C22-1"
                 : deviceType;
 
+        type = (deviceType.equals("C12_LOGGER"))
+                ? "C12"
+                : type;
+
         return String.valueOf(getValue(type));
     }
 

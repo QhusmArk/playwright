@@ -87,7 +87,8 @@ public class AgendaGlue extends BaseGlue {
                 .get();
 
         ProjectSettingsAgendasPanel panel = agendaPO.getAgendasPanel();
-        String topAgendaName = panel.getAgendasTable().getContent().getFirst().getStringByTableHeader(panel.getAgendasTable().getHeader(),"Name");
+        String topAgendaName = panel.getAgendasTable().getContent().getFirst()
+                .getStringByTableHeader(panel.getAgendasTable().getHeader(),"Name");
 
         assertEquals(context().getAgendas().getFirst().getName(), topAgendaName);
     }

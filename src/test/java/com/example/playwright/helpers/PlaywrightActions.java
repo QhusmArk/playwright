@@ -107,17 +107,32 @@ public class PlaywrightActions {
         locator.fill(inputValue);
     }
 
-    public String findOneElementsText(String path, int timeToWait) {
-        Locator locator = getFirstLocator(path);
-        return locator.textContent();
-    }
-
     /**
      * Returns text content of a locator.
      */
     public String findOneElementsText(String path) {
-        Locator locator = getFirstLocator(path);
-        return locator.textContent();
+        return findOneElementsText(path, TIME_TO_WAIT);
+    }
+
+    public String findOneElementsText(String path, int timeToWait) {
+        System.out.println("\nTrying to find text in '" + path + "'");
+
+        // OM path slutar på [x], då kommer vi inte få exception
+        // annars behöver jag lägga till "(" i början och ")[1]" i slutet
+        path = addBracketIfNeeded(path);
+        Locator locator = getFirstLocator(path, timeToWait);
+
+        return locator.textContent().trim();
+    }
+
+    /**
+     * Checks if the string ends with "[{integer}]".
+     * Examples: "test[1]" = true, "abc[999]" = true, "abc[test]" = false.
+     */
+    private String addBracketIfNeeded(String path) {
+        return (path != null && path.matches(".*\\[\\d+]$"))
+                    ? path
+                    : "(" + path + ")[1]";
     }
 
     public String findOneElementsAttribute(final String path, String attributeName) {
@@ -176,8 +191,42 @@ public class PlaywrightActions {
         return processElementExistAndVisible(path, failTestIfNotFound, waitTimeMillis);
     }
 
+//    public final List<String> findManyElementsTexts(String path) {
+//        return page.locator(path).allTextContents();
+//    }
     public final List<String> findManyElementsTexts(String path) {
-        return page.locator(path).allTextContents();
+        return findManyElementsTexts(path, 0);
+    }
+
+    /**
+     * Returns text content from all matching elements.
+     * Optionally waits until matching elements are loaded and stable.
+     */
+    public final List<String> findManyElementsTexts(String path, int timeoutSeconds) {
+        Locator locator = page.locator(path);
+
+        if (timeoutSeconds > 0) {
+            waitUntilElementCountIsStable(locator, timeoutSeconds);
+        }
+
+        return locator.allTextContents();
+    }
+
+    /**
+
+     * Waits up to five seconds for at least one element to appear.
+
+     */
+
+    private void waitUntilElementCountIsStable(Locator locator, int timeoutSeconds) {
+        int waitTimeMillis = (timeoutSeconds == 0)
+                ? 100
+                : timeoutSeconds * 1000;
+
+        page.waitForCondition(
+                () -> locator.count() > 0,
+                new Page.WaitForConditionOptions().setTimeout(waitTimeMillis)
+        );
     }
 
     public int countHowManyVisibleElements(String path) {
@@ -188,6 +237,14 @@ public class PlaywrightActions {
     public int countHowManyElements(String path) {
         Locator elements = page.locator(path);
         return elements.count();
+    }
+
+    /**
+     * @param childPath Must be like "./div"
+     */
+    public int countElementChildren(String parentPath, String childPath) {
+        Locator parentElement = getFirstLocator(parentPath, TIME_TO_WAIT);
+        return parentElement.locator("xpath=" + childPath).count();
     }
 
     public String findOneElementsCssValue(String elementPath, String color) {
@@ -272,7 +329,11 @@ public class PlaywrightActions {
         Instant startTime = Instant.now();
 
         try {
-            boolean hidden = page.locator("xpath=" + xpath).first().isHidden(
+//            boolean hidden = page.locator("xpath=" + xpath).first().isHidden(
+//                    new Locator.IsHiddenOptions()
+//                            .setTimeout(timeToWait * 1000)
+//            );
+            boolean hidden = page.locator(xpath).first().isHidden(
                     new Locator.IsHiddenOptions()
                             .setTimeout(timeToWait * 1000)
             );
@@ -291,7 +352,7 @@ public class PlaywrightActions {
     }
 
     private Locator getFirstLocator(String path) {
-       return getFirstLocator(path, 0);
+       return getFirstLocator(path, TIME_TO_WAIT);
     }
 
     /*
@@ -300,10 +361,6 @@ public class PlaywrightActions {
     Incremental (1, 2, 3...)
     Vissa (1, 3, 7)
      */
-
-//    private Locator getLocator(String path) {
-//
-//    }
 
     /**
      * Automatically waits until the element is:
@@ -315,7 +372,8 @@ public class PlaywrightActions {
      * NB. The method only returns the first element, so this method cannot be used to get many elements.
      */
     private Locator getFirstLocator(String path, int timeoutSeconds) {
-        Locator locator = page.locator(path).first();
+        path = addBracketIfNeeded(path);
+        Locator locator = page.locator(path);
 
         int waitTimeMillis = (timeoutSeconds == 0)
                 ? 100
@@ -324,12 +382,12 @@ public class PlaywrightActions {
         try {
             locator.waitFor(new Locator.WaitForOptions()
                     .setState(WaitForSelectorState.VISIBLE)
-//                    .setTimeout(timeoutSeconds * 1000));
                     .setTimeout(waitTimeMillis));
-            return locator;
+
+            return locator.first();
 
         } catch (PlaywrightException e) {
-            throw new PlaywrightException("Unable to find element. Perhaps it's hidden?", e);
+            throw new PlaywrightException("Unable to find element/s. Perhaps it's hidden?", e);
         }
     }
 
@@ -373,7 +431,7 @@ public class PlaywrightActions {
      * Returns the tag name of the element (lowercase).
      */
     public String getTagName(String path) {
-        Object result = getFirstLocator(path).first().evaluate("el => el.tagName.toLowerCase()");
+        Object result = getFirstLocator(path, 1).evaluate("el => el.tagName.toLowerCase()");
         return (result != null)
                 ? result.toString()
                 : null;
@@ -438,6 +496,7 @@ public class PlaywrightActions {
      * Clicks an element using JavaScript.
      */
     public void makeJavaScriptClick(String path) {
+        System.out.println("path: " + path);
         System.out.println(" -> Retry with JavaScript click.");
 
         page.evaluate("selector => document.querySelector(path)?.click()", path);
@@ -612,5 +671,6 @@ public class PlaywrightActions {
         element.waitFor(); // ensure element is ready
         element.evaluate("el => el.scrollTop = el.scrollHeight");
     }
+
 
 }

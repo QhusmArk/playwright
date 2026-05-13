@@ -2,9 +2,11 @@ package com.example.playwright.steps;
 
 import com.example.api.endpoints.ProjectApi;
 import com.example.helpers.AssertionHelpers;
+import com.example.helpers.JsonUtil;
 import com.example.helpers.builders.BuilderFactory;
 import com.example.helpers.builders.ProjectBuilder;
 import com.example.playwright.components.aside.asideItems.listItems.DeviceItem;
+import com.example.playwright.components.parts.FilterItem;
 import com.example.playwright.config.DeviceProperties;
 import com.example.playwright.helpers.Navigate;
 import com.example.playwright.helpers.PlaywrightActions;
@@ -17,7 +19,10 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static com.example.helpers.StatusAssesser.Status.CHECKED;
 import static com.example.playwright.helpers.enums.IconType.*;
 import static com.example.playwright.helpers.enums.IconType.PROJECT;
 import static com.example.playwright.helpers.enums.ProviderType.*;
@@ -32,17 +37,34 @@ public class AsideFunctionsGlue extends BaseGlue {
     
     @And("this filter {string} is active")
     public void thisFilterIsActive(String expectedFilterText) {
-        List<String> activeFilters = filterPO.getActiveFilters();
-        assertTrue(activeFilters.size() < 2,
-                "Expected no or one active filter, but found " + activeFilters.size());
+        List<FilterItem> allFilterItems = filterPO.getAllFilters();
 
-        // If activeFilters is empty, then no filter was active, hence "".
-        String actualFilterText = activeFilters.isEmpty()
-                ? ""
-                : activeFilters.getFirst();
+        // Get ticked or checkboxed filters
+        List<FilterItem> activeFilters = getActiveFilters(allFilterItems);
 
-        assertEquals(expectedFilterText, actualFilterText,
-                () -> "expectedFilterText/actualFilterText: '" + expectedFilterText + "', '" + actualFilterText + "'");
+        if (expectedFilterText.isEmpty()) {
+            assertTrue(activeFilters.isEmpty());
+
+        } else if (activeFilters.size() == 1) {
+
+            String actualFilterText = activeFilters.getFirst().getText();
+            assertEquals(expectedFilterText, actualFilterText,
+                    () -> "expectedFilterText/actualFilterText: '" + expectedFilterText + "', '" + actualFilterText + "'");
+
+        } else {
+            throw new IllegalStateException("Expected one active filters, but found " + activeFilters.size());
+        }
+    }
+
+    /**
+     * @return ticked or checkboxed filters
+     */
+    public List<FilterItem> getActiveFilters(List<FilterItem> allFilterItems) {
+        return allFilterItems.stream()
+                        .filter(filterItem ->
+                                (filterItem.getIcon() != null && filterItem.getIcon().getType().equals(DONE))
+                                        || (filterItem.getCheckbox() != null && filterItem.getCheckbox().getStatus().equals(CHECKED)))
+                        .toList();
     }
 
     // todo: skillnad på denna och iSetToFilter()?
@@ -71,55 +93,64 @@ public class AsideFunctionsGlue extends BaseGlue {
 
     @Then("These filters are active")
     public void theseFiltersAreActive(DataTable table) {
-        List<String> expectedActiveFilters = table.row(0);
+        List<String> expectedActiveFiltersText = table.row(0);
 
-        List<String> actualActiveFilters = filterPO.getActiveFilters();
+        List<FilterItem> allFilterItems = filterPO.getAllFilters();
+        // Get text from ticked or checkboxed filters
+        List<String> actualActiveFiltersText = getActiveFilters(allFilterItems).stream()
+                .map(FilterItem::getText)
+                .toList();
 
-//        boolean equalLists = areListsEqual(expectedActiveFilters, actualActiveFilters);
-//        assertTrue(equalLists);
-        assertTrue(AssertionHelpers.areTrimmedAndSortedListsIdentical(expectedActiveFilters, actualActiveFilters));
+        List<String> textWithoutCounter = actualActiveFiltersText.stream()
+                .map(value -> value.replaceAll("\\s*\\([^)]*\\)", "").trim())
+                .toList();
+
+        assertTrue(AssertionHelpers.areTrimmedAndSortedListsIdentical(expectedActiveFiltersText, textWithoutCounter));
     }
-
-//    /**
-//     * Comparing two String lists by checking size and then, after sorting, checks contents.
-//     * @param list1
-//     * @param list2
-//     * @return If the lists are equal
-//     */
-//    static boolean areListsEqual(List<String> list1, List<String> list2) {
-//        if (list1 == null || list2 == null) {
-//            return list1 == list2;
-//        }
-//
-//        if (list1.size() != list2.size()) {
-//            return false;
-//        }
-//
-//        List<String> modifiableList1 = new ArrayList<>(list1);
-//        List<String> modifiableList2 = new ArrayList<>(list2);
-//
-//        Collections.sort(modifiableList1);
-//        Collections.sort(modifiableList2);
-//
-//        return modifiableList1.equals(modifiableList2);
-//    }
 
     @And("That the device filters are {string} can be counted using")
     public void thatTheDeviceFiltersAreFourCanBeCountedUsing(String input, DataTable table) {
         List<String> countValidators = table.row(0);
         int expectedActiveFilters = Integer.parseInt(input);
 
+        List<FilterItem> allFilterItems = filterPO.getAllFilters();
+
         for (String countValidator : countValidators) {
 
             Integer actualActiveFilters = switch (countValidator) {
-                case "Filter size" ->                                 // Get the active filters count by the size of found active filters
-                    filterPO.getActiveFilters().size();
-                case "Filter listItem counter" -> filterPO.getAmountOfSelectedFiltersForDevice();        // Get the active filters count by the Device.'selected' listItem
-                case "Filter button counter" -> filterPO.getFilterButtonNumber();                        // Get the active filters count by the number on the filter button
+                case "Filter size" -> getActiveFilters(allFilterItems).size();          // Get the active filters count by the size of found active filters
+                case "Filter listItem counter" -> {                                     // Get the active filters count by the Device.'selected' listItem
+                    FilterItem filterSummaryItem = allFilterItems.getFirst();
+                    yield  getFilterCountFromSelected(filterSummaryItem.getText());
+                }
+                case "Filter button counter" -> Integer.parseInt(filterPO.getFilterButtonNumber());    // Get the active filters count by the number on the filter button
                 default -> throw new IllegalArgumentException("Unexpected value: " + countValidator);
             };
 
             assertEquals(actualActiveFilters, expectedActiveFilters);
+        }
+    }
+
+    private int getFilterCountFromSelected(String selectedText) {
+        if (selectedText.equals("Filter")) {    // If "Filter" then no filters are applied
+            return 0;
+        } else {
+            String[] parts = selectedText.split(" "); // Split the string around the space
+            return Integer.parseInt(parts[0]); // Parse the first part (the digit/s) into an int
+        }
+    }
+
+    /**
+     * Some listItems contain a 'counter' in the end, eg. 'Communication (4)'.
+     * @return 'Communication' if input is 'Communication (4)'
+     */
+    private String removeCounterFromFilterText(String listItemText) {
+        Pattern pattern = Pattern.compile("\\(.*?\\)");
+        Matcher matcher = pattern.matcher(listItemText);
+        if (matcher.find()) {
+            return matcher.replaceAll("").trim();
+        } else {
+            return listItemText;
         }
     }
 
@@ -150,7 +181,6 @@ public class AsideFunctionsGlue extends BaseGlue {
             filterPO.selectFilter(filterOnThisDeviceType);
 
             // Now get all deviceItems after filter is been applied
-//            List<DeviceItem> deviceItems = asidePO.getAside().getDeviceItems();
             List<DeviceItem> deviceItems = asidePO.getAside(10).getDeviceItems();
 
             // Use the filter value to deduct DeviceType
@@ -325,7 +355,6 @@ public class AsideFunctionsGlue extends BaseGlue {
             // When a search is done, we need to reset search with cancel-button. Else list do not show all selected.
             asidePO.clickAsideHeaderIcon(CANCEL);
         }
-
     }
 
     @And("click on bulk action {string} icon")
@@ -364,6 +393,13 @@ public class AsideFunctionsGlue extends BaseGlue {
     @And("I remove all device filters")
     public void iRemoveAllDeviceFilters() {
         filterPO.clearAllDeviceFilters();
+    }
+
+    @And("these filters exist")
+    public void theseFiltersExist() {
+
+        List<FilterItem> allFilters = filterPO.getAllFilters();
+        JsonUtil.createJsonAndSave(allFilters);
     }
 }
 

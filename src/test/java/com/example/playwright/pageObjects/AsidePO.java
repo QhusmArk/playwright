@@ -412,8 +412,8 @@ public class AsidePO extends CommonPO {
 
             String headerText = actions().findOneElementsText(headerPath);
             // Remove the sorting arrow
-            if (headerText.contains("\narrow_upward")) {
-                headerText = headerText.replace("\narrow_upward", "");
+            if (headerText.contains("arrow_upward")) {
+                headerText = headerText.replace("arrow_upward", "");
             }
 
             headerRow.addContent(headerText);
@@ -1319,8 +1319,10 @@ public class AsidePO extends CommonPO {
     public void createBulkActionForAll(ProviderType providerType) {
         AsideSize asideSize = actions().getAsideSize();
         // Tick the first checkbox
+        PlaywrightActions.sleep(1);
+
         String firstIcon = (asideSize.equals(COMPACT)
-                ? "((//div[@data-qa-id='list-item'])[1] //i)[1]"
+                ? "((//div[@data-qa-id='list-item'])[1] //i)[1]/parent::div"
                 : "((//tr[contains(@class, 'cursor-pointer')])[1] //i)[1]");  // MEDIUM/FULL
         actions().makeClick(firstIcon);
 
@@ -1374,6 +1376,7 @@ public class AsidePO extends CommonPO {
         if (visibleItems > 1) {
             throw new IllegalStateException("More than one item had text '" + text + "'");
         }
+        PlaywrightActions.sleep(1);
     }
 
     /**
@@ -1384,7 +1387,7 @@ public class AsidePO extends CommonPO {
 
         String clickTarget = switch (asideSize) {
             case COMPACT -> firstInAsideToBeChecked
-                    ? "//div[@data-qa-id='list-item'] //i"
+                    ? "(//div[@data-qa-id='list-item'] //i)[1]/parent::div"
                     : "//div[@data-qa-id='list-item'] //div[@role='checkbox']";
 
             case MEDIUM,FULL -> firstInAsideToBeChecked

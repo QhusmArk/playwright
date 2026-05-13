@@ -65,32 +65,4 @@ public class TestUserLoader {
 
         return value;
     }
-
-    /**
-     * Returns the shared API user.
-     */
-    public static TestUser createApiUser() {
-        String email = getRequiredProperty("api.user.email");
-        String role = getRequiredProperty("api.user.role");
-        int id = Integer.parseInt(getRequiredProperty("api.user.id"));
-        String password = getRequiredProperty("api.user.password");
-        String token = getRequiredProperty("api.user.token");
-
-        return new TestUser(email, role, id, password, token);
-    }
-
-    /**
-     * Returns a required property value.
-     */
-    private static String getRequiredProperty(String key) {
-        Properties properties = loadProperties();
-
-        String value = properties.getProperty(key);
-
-        if (value == null || value.isBlank()) {
-            throw new IllegalStateException("Missing required user property: " + key);
-        }
-
-        return value;
-    }
 }
