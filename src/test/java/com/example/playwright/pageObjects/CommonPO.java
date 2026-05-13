@@ -364,9 +364,6 @@ public abstract class CommonPO {
         actions().makeClick("//form //button //span[contains(text(), 'Create user')]");
     }
 
-//    public void clickOnButton(String buttonToClick) {
-//        actions().makeClick("//button //span[text()='"+buttonToClick+"']");
-//    }
     public void clickOnButton(String buttonToClick) {
         actions().makeClick("//button[.//span[text()='"+buttonToClick+"']]");
     }
@@ -2490,6 +2487,7 @@ public abstract class CommonPO {
 
     public void clickButton(String button) {
         switch (button.toLowerCase()) {
+            case "login" -> actions().makeClick("//input[@type='submit']");
             case "apply", "create", "save" -> actions().makeClick("//button[@type='submit']");
             case "meatball" -> actions().makeClick("//div[@role='toolbar'] //i[text()='more_vert']/ancestor::button");
             case "vibration report" -> actions().makeClick("//a[@data-qa-id='project_mp_vibration_report']");

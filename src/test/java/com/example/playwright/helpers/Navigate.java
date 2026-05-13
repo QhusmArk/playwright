@@ -27,8 +27,11 @@ public class Navigate {
         return TestEnvironment.getWebUrl();
     }
 
+//    private static String base() {
+//        return "https://" + webUrl() + "/";
+//    }
     private static String base() {
-        return "https://" + webUrl() + "/";
+        return "https://" + webUrl();
     }
 
     /***************************** Starters **************************/
@@ -38,16 +41,16 @@ public class Navigate {
     }
 
     public static Navigate company() {
-        return new Navigate(base() + "#/company");
+        return new Navigate(base() + "/#/company");
     }
 
     // only for /#/company/projects/5657/details?
     public static Navigate companyProjects(final int projectId) {
-        return new Navigate(base() + "#/company/projects/" + projectId);
+        return new Navigate(base() + "/#/company/projects/" + projectId);
     }
 
     public static Navigate project(final int projectId) {
-        return new Navigate(base() + "#/project/" + projectId);
+        return new Navigate(base() + "/#/project/" + projectId);
     }
 
     /***************************** Endpoints **************************/

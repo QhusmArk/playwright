@@ -24,8 +24,8 @@ public class BrowserHooks {
 
     // Control headless or not with this boolean. Both have same size. //todo: change headless to larger size to speed up runs? If so, getAside scrolling need rework.
     @Getter
-    private static final boolean isHeadless = true;
-//    private static final boolean isHeadless = false;
+//    private static final boolean isHeadless = true;
+    private static final boolean isHeadless = false;
 
     protected static final ThreadLocal<Playwright> playwright = new ThreadLocal<>();
     protected static final ThreadLocal<Browser> browser = new ThreadLocal<>();

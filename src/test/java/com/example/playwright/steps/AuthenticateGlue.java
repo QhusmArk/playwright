@@ -1,10 +1,12 @@
 package com.example.playwright.steps;
 
+import com.example.helpers.Randomizer;
 import com.example.playwright.components.panels.LoginPage;
 import com.example.playwright.helpers.Navigate;
 import com.example.playwright.helpers.PlaywrightActions;
 import com.example.playwright.hooks.BrowserHooks;
-import io.cucumber.java.en.And;
+import com.example.playwright.hooks.testUsers.TestUser;
+import com.example.playwright.hooks.testUsers.TestUserPool;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
@@ -13,37 +15,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AuthenticateGlue extends BaseGlue {
 
-    @When("I enter {string} and {string}")
-    public void enterLoginCredentials(String username, String password) {
-        loginPO.enterLoginCredentials(username, password);
+//    @When("I enter my email address as {string}")
+//    public void enterEmailAddress(String username) {
+//        loginPO.enterResetUsername(username);
+//    }
+
+    @When("I enter my email address")
+    public void enterEmailAddress() {
+        TestUser currentUser = TestUserPool.getCurrentUser();
+
+        loginPO.enterResetUsername(currentUser.email());
     }
 
-    @When("I enter my email address as {string}")
-    public void enterEmailAddress(String username) {
-        loginPO.enterResetUsername(username);
+    @When("I use wrong password for login")
+    public void iUseWrongPasswordForLogin() {
+        TestUser currentUser = TestUserPool.getCurrentUser();
+
+        loginPO.enterLoginCredentials(currentUser.email(), Randomizer.randomString(10));
+        loginPO.clickButton("Login");
     }
 
-    @And("click Login")
-    public void clickLogin() {
-        loginPO.clickLoginButton();
-    }
+    @Then("I get error messages")
+    public void iGetErrorMessages() {
+        LoginPage loginPage = loginPO.getLoginPage();
 
-    /**
-     * Checks if browser is still in /login/ after login attempt.
-     * @param expectedResult If we believe the login attempt to be successful.
-     */
-    @Then("my attempt to login was a {result}")
-    public void validateLoginResult(boolean expectedResult) {
-        // give driver time to load either one of these pages
-
-        if (expectedResult) {
-            assertUrlContain("overview");
-        } else {
-            LoginPage loginPage = loginPO.getLoginPage();
-
-            assertEquals("Login Failed!",  loginPage.getErrorMessage());
-            assertEquals("Your username and/or password were incorrect. Are you sure you're using the correct URL?",  loginPage.getErrorExplanation());
-        }
+        assertEquals("Login Failed!",  loginPage.getErrorMessage());
+        assertEquals("Your username and/or password were incorrect. Are you sure you're using the correct URL?",  loginPage.getErrorExplanation());
     }
 
     @Then("I can request a password reset")
@@ -96,8 +93,10 @@ public class AuthenticateGlue extends BaseGlue {
     @Then("{string} link leads to {string}")
     public void linkLeadsToUrl(String link, String expectedUrl) {
         String urlInLink = loginPO.getRefUrlFromLink(link);
+
+        System.out.println("expectedUrl: " + expectedUrl);
+        System.out.println("urlInLink: " + urlInLink);
+
         assertTrue(urlInLink.contains(expectedUrl));
     }
-
-
 }
