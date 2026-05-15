@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 
 import static com.example.api.glue.ApiDeviceGlue.setStdAndTriggerForC22;
 import static com.example.playwright.helpers.enums.DeviceType.*;
+import static com.example.playwright.helpers.enums.DeviceType.C22;
 import static com.example.playwright.helpers.enums.IconType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -596,7 +597,7 @@ public class DeviceGlue extends BaseGlue {
     public void allDevicesInTheListHaveDetails() {
 
         List<DeviceType> connectedDeviceTypes = List.of(
-                DeviceType.C22,
+                C22,
                 POINT,
                 DeviceType.D10,
                 DeviceType.C12_LOGGER
@@ -609,10 +610,7 @@ public class DeviceGlue extends BaseGlue {
                     .device(type, serial)
                     .details()
                     .get();
-
-//            DeviceDetailsPanel deviceDetailsPanel = ddPO.getDeviceDetailsPanel(type.getType());
         });
-
     }
 
     @When("I navigate to device details, description is {string}")

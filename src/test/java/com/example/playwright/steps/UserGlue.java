@@ -41,21 +41,18 @@ public class UserGlue extends BaseGlue {
         userPO.clickButtonText("Save");
     }
 
-    @Then("the name change request was a {string}")
-    public void validateChangedFirstName(String expected) {
+    @Then("the name change request was a success")
+    public void validateChangedFirstName() {
         //get the old name
         String previousFirstName = userBeforeChange.getFirstName();
-        System.out.println("previousFirstName: " + previousFirstName);
         // Go to UserProfile to grab current data
         menuPO.openUserMenuAndSelectMenuItem("USER_PROFILE");
 
         //get the new name
         String currentFirstName = upPO.getFirstName();
-        System.out.println("currentFirstName: " + currentFirstName);
         // successful namechange = true
         assertNotEquals(previousFirstName, currentFirstName);
     }
-
 
     @When("I create a user with email sent")
     public void createUserAndSendEmail() {
@@ -215,21 +212,6 @@ public class UserGlue extends BaseGlue {
         if (currentLanguage.equals("Svenska") || currentLanguage.equals("Swedish")) {
             upPO.changeLanguage(currentLanguage);
         }
-    }
-
-    @Then("the name change request was a {result}")
-    public void validateChangedFirstName(boolean expected) {
-        //get the old name
-        String previousFirstName = userBeforeChange.getFirstName();
-
-        // Go to UserProfile to grab current data
-        userPO.openUserMenuAndSelectMenuItem("USER_PROFILE");
-
-        //get the new name
-        String currentFirstName = upPO.getFirstName();
-
-        // successful namechange = true
-        assertNotEquals(previousFirstName.equals(currentFirstName), expected);
     }
 
     @And("I navigate to Support")

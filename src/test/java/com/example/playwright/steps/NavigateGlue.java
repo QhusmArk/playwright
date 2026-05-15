@@ -15,8 +15,8 @@ import static com.example.playwright.helpers.enums.DeviceType.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NavigateGlue extends BaseGlue {
-//    Context context = context();
 
+    @And("I am at account {string}")
     @And("I navigate to account {string}")
     public void iNavigateToAccount(final String endpoint) {
         switch (endpoint) {
@@ -25,6 +25,8 @@ public class NavigateGlue extends BaseGlue {
             case "projects" -> Navigate.company().projects().get();
             case "users" -> Navigate.company().users().get();
             case "overview" -> Navigate.company().overview().get();
+            case "users create" -> Navigate.company().users().create().get();
+            case "billing_reports create" -> Navigate.company().billingReports().create().get();
             default -> throw new IllegalArgumentException("Unknown endpoint");
         }
     }

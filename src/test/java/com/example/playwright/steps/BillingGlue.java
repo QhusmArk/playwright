@@ -42,7 +42,7 @@ public class BillingGlue extends BaseGlue {
         // Wait until report is done creating
         billingPO.waitForBillingReportCompletion();
 
-        System.out.println(Navigate.getCurrentUrl());
+//        System.out.println(Navigate.getCurrentUrl());
     }
 
     @And("I create an Account Projects Billing Report for {string}")

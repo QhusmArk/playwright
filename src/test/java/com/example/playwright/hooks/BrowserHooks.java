@@ -24,8 +24,8 @@ public class BrowserHooks {
 
     // Control headless or not with this boolean. Both have same size. //todo: change headless to larger size to speed up runs? If so, getAside scrolling need rework.
     @Getter
-//    private static final boolean isHeadless = true;
-    private static final boolean isHeadless = false;
+    private static final boolean isHeadless = true;
+//    private static final boolean isHeadless = false;
 
     protected static final ThreadLocal<Playwright> playwright = new ThreadLocal<>();
     protected static final ThreadLocal<Browser> browser = new ThreadLocal<>();
@@ -137,16 +137,6 @@ public class BrowserHooks {
                 .map(String::trim)
                 .map(entry -> entry.split(":"))
                 .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
-    }
-
-    /**
-     * TypeRegistry so that we can cast expectations to boolean.
-     * @param input success or failure
-     * @return Boolean true or false if input is "success" or "failure"
-     */
-    @ParameterType("success|failure")
-    public boolean result(String input) {
-        return "success".equalsIgnoreCase(input);
     }
 
     @ParameterType("Device_.+")

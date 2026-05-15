@@ -56,14 +56,18 @@ public class UserHooks extends BaseGlue {
         }
     }
 
-    @After
+    @After(order = 2)
+    public void deleteTestProject(Scenario scenario) {
+        deleteProject();    // Require api-user, which is the same as test-user
+    }
+
+    @After(order = 3)
     public void releaseTestUser(Scenario scenario) {
         TestUserPool.releaseCurrentUser();
     }
 
     @After(order = 100)
     public void clearScenarioContext() {
-        deleteProject();
         ScenarioContext.clear();
         TestContextHolder.clear();
     }
