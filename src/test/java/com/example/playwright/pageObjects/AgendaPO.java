@@ -322,33 +322,11 @@ public class AgendaPO extends CommonPO {
         clickSaveButton();
     }
 
-//    /**
-//     * url: .../project/id/measure_points/id/settings/agenda-settings
-//     * Get name of selected Agenda in an MP.
-//     * @return Agenda name if MP has an agenda.
-//     */
-//    public String getAgendaNameFromMeasuringPoint() {
-//        if (actions().elementExistWithRefresh(AGENDA_DROPDOWN, false, 20)) {
-//            return actions().findOneElementsText(AGENDA_DROPDOWN);
-//        } else {
-//            return null;
-//        }
-//    }
-
-//    public int getNumberOfTimeSlotsFromMeasuringPoint() {
-//        // Validate we're in the right place
-//        isPanelHeaderVisible("mp-agenda-panel-header");
-//        return actions().countHowManyElements("//*[@data-qa-id='accumulation_span']");
-//    }
-
     /**
      * url: .../project/id/measure_points/id/settings/agenda-settings
      * @param mpName Name of MP that we want to copy agenda settings from.
      */
     public void copyAgendaSettings(final String mpName) {
-        // Validate we're in the right place
-        isPanelHeaderVisible("mp-agenda-panel-header");
-
         // Click on Copy Settings Button
         actions().makeClick("//*[text()='Copy settings']");
 

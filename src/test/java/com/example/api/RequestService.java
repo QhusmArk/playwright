@@ -1,6 +1,7 @@
 package com.example.api;
 
 import com.example.playwright.config.TestEnvironment;
+import com.example.playwright.config.TestUserLoader;
 import com.example.playwright.hooks.testUsers.TestUser;
 import com.example.playwright.hooks.testUsers.TestUserPool;
 import io.restassured.RestAssured;
@@ -26,12 +27,34 @@ public class RequestService {
     /**
      * Always uses admin credentials to gain access to api
      */
+//    private static Map<String, String> getAdminCredentials(final String api) {
+//        TestUser apiAdmin = TestUserPool.getCurrentUser();
+//        if (!apiAdmin.role().equals("ADMIN")) {
+//            throw new IllegalStateException("Only ADMIN roles can access this API for this purpose.");
+//        }
+//
+//        Map<String, String> map = new HashMap<>();
+//        if (api.startsWith("v0") || api.startsWith("v1")) {
+//            map.put("user", "user:" + apiAdmin.id());   // "user:XXXX"
+//            map.put("pw", apiAdmin.token());
+//        } else {
+//            map.put("user", apiAdmin.email());
+//            map.put("pw", apiAdmin.password());
+//        }
+//        return map;
+//    }
     private static Map<String, String> getAdminCredentials(final String api) {
-        TestUser apiAdmin = TestUserPool.getCurrentUser();
-        if (!apiAdmin.role().equals("ADMIN")) {
-            throw new IllegalStateException("Only ADMIN roles can access this API for this purpose.");
-        }
-        
+
+        TestUser currentUser = TestUserPool.getCurrentUser();
+
+        TestUser apiAdmin = (currentUser.role().equals("ADMIN"))
+                ? currentUser
+                : TestUserLoader.loadCleanupApiUser();
+//        if (!currentUser.role().equals("ADMIN")) {
+//            TestUser api = TestUserLoader.loadCleanupApiUser();
+//            throw new IllegalStateException("Only ADMIN roles can access this API for this purpose.");
+//        }
+
         Map<String, String> map = new HashMap<>();
         if (api.startsWith("v0") || api.startsWith("v1")) {
             map.put("user", "user:" + apiAdmin.id());   // "user:XXXX"

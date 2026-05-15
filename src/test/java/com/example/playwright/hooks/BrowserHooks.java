@@ -5,6 +5,7 @@ import com.example.playwright.helpers.PlaywrightActions;
 import com.example.playwright.helpers.enums.AsideSize;
 import com.example.playwright.helpers.enums.DeviceType;
 import com.example.playwright.helpers.enums.IconType;
+import com.example.playwright.hooks.testUsers.TestUserPool;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.Cookie;
 import io.cucumber.java.After;
@@ -13,6 +14,8 @@ import io.cucumber.java.BeforeStep;
 import io.cucumber.java.ParameterType;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,6 +65,7 @@ public class BrowserHooks {
         // todo: find another home for this line? This is Test requirement, not browser context
         // and not all tests need RequestService
         RequestService.setUp();
+        System.out.println("api_user: " + TestUserPool.getCurrentUser().email());
     }
 
     public static Page getPage() {
@@ -99,8 +103,9 @@ public class BrowserHooks {
         step++;
     }
 
-    @After(order = 1)
+    @After(order = 70)
     public void tearDown() {
+        System.out.println("After: " + 70);
         if (page.get() != null) page.get().close();
         if (context.get() != null) context.get().close();
         if (browser.get() != null) browser.get().close();
@@ -111,6 +116,9 @@ public class BrowserHooks {
         browser.remove();
         playwright.remove();
         actions.remove();
+
+        System.out.println("Time: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        System.out.println("************************** Test end **************************\n");
     }
 
     /**

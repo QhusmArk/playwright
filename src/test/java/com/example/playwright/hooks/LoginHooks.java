@@ -80,10 +80,10 @@ public class LoginHooks extends BaseGlue {
     private boolean isManualLoginScenario(Scenario scenario) {
         var tags = scenario.getSourceTagNames();
 
-        return tags.contains("@loginWithAdmin")
-                || tags.contains("@loginWithUser")
-                || tags.contains("@loginWithClient")
-                || tags.contains("@loginWithBlaster");
+        return tags.contains("@manualLoginWithAdmin")
+                || tags.contains("@manualLoginWithUser")
+                || tags.contains("@manualLoginWithClient")
+                || tags.contains("@manualLoginWithBlaster");
     }
 
     private void loginCurrentUser() {

@@ -28,6 +28,7 @@ import com.example.playwright.config.TestDataReader;
 import com.example.playwright.config.TestEnvironment;
 import com.example.playwright.hooks.ScenarioContext;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.example.helpers.builders.BuilderFactory.Providers.MESSAGE_RULE;
@@ -870,23 +871,39 @@ public class TestDataBuilder {
 
         // If @deleteProject did not work there might be residual projects w same name.
         // These project/s need to be deleted so that test don't break for this reason.
-        String newName = prop.getString("name");
+//        String newName = prop.getString("name");
+//
+//        String projectID = prop.hasKey("project_ID")
+//                ? prop.getString("project_ID")
+//                : Randomizer.randomString(6);
+//
+//        String description = prop.hasKey("description")
+//                ? prop.getString("description") +
+//                    ((ScenarioContext.getScenarioName() != null)
+//                        ? ", " + ScenarioContext.getScenarioName()
+//                        : "")
+//                : "Scn: " + ScenarioContext.getScenarioName();
 
-        String projectID = prop.hasKey("project_ID")
+        String randomString = prop.hasKey("project_ID")
                 ? prop.getString("project_ID")
                 : Randomizer.randomString(6);
 
-        String description = prop.hasKey("description")
-                ? prop.getString("description") +
-                    ((ScenarioContext.getScenarioName() != null)
-                        ? ", " + ScenarioContext.getScenarioName()
-                        : "")
-                : "Scn: " + ScenarioContext.getScenarioName();
+        String newName = prop.getString("name") + "-" + randomString;
+
+//        String description = prop.hasKey("description")
+//                ? prop.getString("description") +
+//                ((ScenarioContext.getScenarioName() != null)
+//                        ? ", " + ScenarioContext.getScenarioName()
+//                        : "")
+//                : "Scn: " + ScenarioContext.getScenarioName();
+
+        long unixMillis = TimeConverter.convertToUnixTimeMillis(LocalDateTime.now());
+        String createdAtUnixMillis = Long.toString(unixMillis);
 
         builder
                 .givenName(newName)
-                .thenProjectId(projectID)
-                .withDescription(description)
+                .thenProjectId(createdAtUnixMillis)
+                .withDescription("Scn: " + ScenarioContext.getScenarioName())
                 .withTimezone(prop.getString("timezone"))
                 .withTimeFrom(TimeConverter.convertToStandardizedDateTime(prop.getString("start-time")))
                 .withTimeTo(TimeConverter.convertToStandardizedDateTime(prop.getString("stop-time")))

@@ -87,6 +87,11 @@ public class ProjectApi extends ModelApi {
         return populateList(response, Project.class);
     }
 
+    public static List<Project> getProjects(final String user, final String pw) {
+        Response response = RequestService.request(Method.GET, "project", user, pw);
+        return populateList(response, Project.class);
+    }
+
     public static Project updateProject(final int id, final String body) {
         Response response = RequestService.request(Method.PUT, "project/" + id, body);
         return populateObject(response, Project.class);

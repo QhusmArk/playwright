@@ -27,9 +27,6 @@ public class Navigate {
         return TestEnvironment.getWebUrl();
     }
 
-//    private static String base() {
-//        return "https://" + webUrl() + "/";
-//    }
     private static String base() {
         return "https://" + webUrl();
     }

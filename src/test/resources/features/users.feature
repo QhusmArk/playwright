@@ -3,7 +3,6 @@
 Feature: Users
 
   @automation
-#  @manualLoginWithAdmin
   @loginWithAdmin
   Scenario: Change user first name
     When I open UserProfile
@@ -13,7 +12,6 @@ Feature: Users
 
   @noUpgEnv
   @automation
-#  @manualLoginWithAdmin
   @loginWithAdmin
   Scenario: Change user language
     When I open UserProfile

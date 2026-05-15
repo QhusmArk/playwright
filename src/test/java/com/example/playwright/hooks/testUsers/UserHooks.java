@@ -1,16 +1,11 @@
-package com.example.playwright.hooks;
+package com.example.playwright.hooks.testUsers;
 
-import com.example.api.endpoints.ProjectApi;
-import com.example.api.models.project.Project;
-import com.example.helpers.testData.TestContextHolder;
-import com.example.playwright.hooks.testUsers.TestUserPool;
+import com.example.playwright.hooks.ScenarioContext;
 import com.example.playwright.steps.BaseGlue;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class UserHooks extends BaseGlue {
@@ -25,7 +20,7 @@ public class UserHooks extends BaseGlue {
                 ? TestUserPool.acquireUserWithRole(requiredRole)
                 : TestUserPool.acquireUser()
                 .orElseThrow(() -> new RuntimeException("No available test users in pool"));
-        System.out.println("user: " + user.email());
+        System.out.println("test_user: " + user.email());
     }
 
     private String resolveRequiredRole(Scenario scenario) {
@@ -56,43 +51,9 @@ public class UserHooks extends BaseGlue {
         }
     }
 
-    @After(order = 2)
-    public void deleteTestProject(Scenario scenario) {
-        deleteProject();    // Require api-user, which is the same as test-user
-    }
-
-    @After(order = 3)
+    @After(order = 90)
     public void releaseTestUser(Scenario scenario) {
+        System.out.println("After: " + 90);
         TestUserPool.releaseCurrentUser();
     }
-
-    @After(order = 100)
-    public void clearScenarioContext() {
-        ScenarioContext.clear();
-        TestContextHolder.clear();
-    }
-
-    /**
-     * Removing the project used in the test.
-     */
-    public void deleteProject() {
-        // Abort the entire test if the prerequisite is not met
-//        if (skipScenario.get()) {
-//            return;
-//        }
-
-        Project project = context().getProject();
-
-        if (project == null) {
-            System.out.println("No project in context(). No deleting to be done.");
-        } else {
-            int projectId = project.getId();
-            System.out.println("Deleting test project " + projectId + ".");
-            ProjectApi.deleteProject(projectId);
-        }
-
-        System.out.println("Time: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        System.out.println("************************** Test end **************************\n");
-    }
-
 }

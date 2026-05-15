@@ -22,3 +22,4 @@ twilio.properties
 device.properties
 qa_computer.properties
 secrets.local.properties
+/src/test/java/com/example/helpers/devel/

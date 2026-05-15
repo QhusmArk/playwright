@@ -25,6 +25,20 @@ public class TestUserLoader {
                 .toList();
     }
 
+    public static TestUser loadCleanupApiUser() {
+        Properties properties = loadProperties();
+
+        return properties.stringPropertyNames().stream()
+                .filter(key -> key.startsWith("cleanup.user."))
+                .filter(key -> key.endsWith(".email"))
+                .map(key -> key.substring("cleanup.user.".length(), key.length() - ".email".length()))
+                .distinct()
+                .sorted(Comparator.naturalOrder())
+                .map(userKey -> createCleanupUser(properties, userKey))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No cleanup user found"));
+    }
+
     private static Properties loadProperties() {
         Properties properties = new Properties();
 
@@ -42,6 +56,18 @@ public class TestUserLoader {
         } catch (IOException e) {
             throw new IllegalStateException("Could not load " + FILE_NAME_USERS, e);
         }
+    }
+
+    private static TestUser createCleanupUser(Properties properties, String userKey) {
+        String prefix = "cleanup.user." + userKey + ".";
+
+        return new TestUser(
+                required(properties, prefix + "email"),
+                required(properties, prefix + "role"),
+                Integer.parseInt(required(properties, prefix + "id")),
+                required(properties, prefix + "password"),
+                required(properties, prefix + "token")
+        );
     }
 
     private static TestUser createTestUser(Properties properties, String userKey) {

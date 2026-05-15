@@ -148,6 +148,13 @@ public class TimeConverter {
         return time;
     }
 
+    public static String unixMillisToUtcString(final long milliseconds) {
+        return Instant.ofEpochMilli(milliseconds)
+                .atZone(ZoneOffset.UTC)
+                .toLocalDateTime()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
+
     public static LocalDateTime fromTimestamp(String unixTime) {
         return fromTimestamp(unixTime, "UTC");
     }
@@ -417,6 +424,15 @@ public class TimeConverter {
 
     public static LocalDateTime parseToLDT(String timeToFormat, String requestedFormat) {
         return LocalDateTime.parse(timeToFormat, DateTimeFormatter.ofPattern(requestedFormat));
+    }
+
+    /**
+     * @return true if the passed unix timestamp is older than 5 hours.
+     */
+    public boolean isOlderThan(long unixTimeStampMillis, long dueTime) {
+        long fiveHoursInMillis = dueTime * 60 * 60 * 1000;
+
+        return System.currentTimeMillis() - unixTimeStampMillis > fiveHoursInMillis;
     }
 
 

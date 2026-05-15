@@ -18,10 +18,6 @@ public class SessionCookieManager {
         return SESSION_DIR.resolve(toSessionCookieFileName(user));
     }
 
-    public static boolean hasSessionCookie(TestUser user) {
-        return Files.exists(getSessionCookiePath(user));
-    }
-
     public static Optional<Cookie> loadSessionCookie(TestUser user) {
         Path path = getSessionCookiePath(user);
 
